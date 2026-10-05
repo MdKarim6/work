@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Poster Generator — Optimo Inspired</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=League+Spartan:wght@700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-color: #d8a5b2;
+      --ink-color: #111111;
+      --font-headline: 'Anton', sans-serif;
+      --font-brand: 'Syne', sans-serif;
+      --font-accent: 'League Spartan', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #181818;
+      color: #f1f1f1;
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      gap: 28px;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .controls-panel {
+      width: 360px;
+      background: #262626;
+      border: 1px solid #3b3b3b;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-height: calc(100vh - 48px);
+      overflow: auto;
+    }
+
+    .controls-panel h1 {
+      font-size: 1.1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    .controls-panel p {
+      color: #a8a8a8;
+      font-size: 0.86rem;
+      line-height: 1.35;
+    }
+
+    .controls-panel h2 {
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #c9c9c9;
+      padding-top: 8px;
+      border-top: 1px solid #3b3b3b;
+      margin-top: 4px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    label {
+      color: #bdbdbd;
+      font-size: 0.82rem;
+    }
+
+    input[type="text"], select {
+      width: 100%;
+      background: #151515;
+      border: 1px solid #454545;
+      color: white;
+      padding: 9px 10px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+
+    input[type="range"], input[type="color"] {
+      width: 100%;
+      accent-color: #d8a5b2;
+    }
+
+    .color-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #151515;
+      border: 1px solid #454545;
+      border-radius: 6px;
+      padding: 6px 8px;
+    }
+
+    .small-note {
+      font-size: 0.75rem;
+      color: #8d8d8d;
+      line-height: 1.35;
+    }
+
+    .export-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .export-button {
+      border: 1px solid #505050;
+      background: #161616;
+      color: #fff;
+      border-radius: 7px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: 0.18s ease;
+    }
+
+    .export-button:hover {
+      background: #303030;
+      border-color: #777;
+    }
+
+    .export-button.primary {
+      background: #f2f2f2;
+      color: #111;
+      border-color: #f2f2f2;
+    }
+
+    .export-button.primary:hover {
+      background: #fff;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+        display: block;
+      }
+
+      .controls-panel {
+        display: none !important;
+      }
+
+      .poster-canvas {
+        width: 6.6667in;
+        height: 10in;
+        box-shadow: none;
+        margin: 0 auto;
+        page-break-inside: avoid;
+      }
+
+      @page {
+        size: 6.6667in 10in;
+        margin: 0;
+      }
+    }
+
+    .poster-canvas {
+      position: relative;
+      width: 540px;
+      height: 810px;
+      background: var(--bg-color);
+      color: var(--ink-color);
+      padding: 40px 32px 36px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+      user-select: none;
+      isolation: isolate;
+    }
+
+    .poster-image {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      max-width: none;
+      width: 220px;
+      opacity: 0.9;
+      display: none;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .top-sub-header {
+      position: relative;
+      z-index: 2;
+      width: 94%;
+      height: 42px;
+      margin: 0 auto;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 7px;
+      text-align: center;
+      font-family: var(--font-accent);
+      font-weight: 900;
+      font-style: normal;
+      text-transform: uppercase;
+      line-height: 1;
+      transform: rotate(0deg);
+      transform-origin: center center;
+      white-space: nowrap;
+    }
+
+    .top-sub-header .top-letter {
+      display: inline-block;
+      flex: 0 0 auto;
+      transform-origin: center center;
+    }
+
+    .top-sub-header .top-space {
+      display: inline-block;
+      flex: 0 0 13px;
+      width: 13px;
+    }
+
+    .brandmark-header {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      text-align: center;
+      font-family: var(--font-brand);
+      font-weight: 800;
+      text-transform: uppercase;
+      line-height: .9;
+      transform-origin: center;
+    }
+
+    .headline-stack {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      line-height: .9;
+      position: relative;
+      margin-top: -6px;
+    }
+
+    .headline-row {
+      font-family: var(--font-headline);
+      font-weight: 400;
+      text-transform: uppercase;
+      color: var(--ink-color);
+      text-align: center;
+      line-height: .88;
+      letter-spacing: -0.02em;
+    }
+
+    .row-middle-container,
+    .row-stops-container {
+      width: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .flank-badge {
+      position: absolute;
+      font-family: var(--font-accent);
+      font-weight: 900;
+      font-style: italic;
+      text-transform: uppercase;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      letter-spacing: .28em;
+      white-space: nowrap;
+    }
+
+    .flank-badge.left { left: 4px; transform: rotate(-7deg); }
+    .flank-badge.right { right: 4px; transform: rotate(7deg); }
+    .flank-badge span { display:block; margin: 2px 0; }
+
+
+    .bottom-credits {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      font-family: var(--font-accent);
+      font-weight: 900;
+      font-style: italic;
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      padding: 0 2px;
+    }
+
+    .credit-left,
+    .credit-right {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      white-space: nowrap;
+      transform-origin: center center;
+    }
+
+    .bottom-letter {
+      display: inline-block;
+      flex: 0 0 auto;
+      transform-origin: center center;
+      line-height: 1;
+    }
+
+    .bottom-space {
+      display: inline-block;
+      flex: 0 0 12px;
+      width: 12px;
+    }
+
+    .credit-left { transform: rotate(-5deg); }
+    .credit-right { transform: rotate(5deg); }
+
+    @media (max-width: 1100px) {
+      body { flex-direction: column; align-items: center; }
+      .controls-panel { width: min(92vw, 700px); max-height: none; }
+      .poster-canvas { width: min(92vw, 540px); height: calc(min(92vw, 540px) * 1.5); }
+    }
+  </style>
+</head>
+<body>
+  <aside class="controls-panel">
+    <div>
+      <h1>Poster Generator</h1>
+      <p>Use this anytime to make an Optimo-style poster. Edit the text, fonts, sizes, colors, tilt, and even insert an image while keeping the original layout feel.</p>
+    </div>
+
+    <h2>Text</h2>
+    <div class="control-group">
+      <label for="topTextInput">Top text</label>
+      <input type="text" id="topTextInput" value="THE G.D. DISCO BAND &" />
+    </div>
+    <div class="control-group">
+      <label for="brandTextInput">Brand / header</label>
+      <input type="text" id="brandTextInput" value="OPTIMO" />
+    </div>
+    <div class="row">
+      <div class="control-group">
+        <label for="line1Input">Line 1</label>
+        <input type="text" id="line1Input" value="UNTIL" />
+      </div>
+      <div class="control-group">
+        <label for="line2Input">Line 2</label>
+        <input type="text" id="line2Input" value="THE" />
+      </div>
+    </div>
+    <div class="row">
+      <div class="control-group">
+        <label for="line3Input">Line 3</label>
+        <input type="text" id="line3Input" value="MUSIC" />
+      </div>
+      <div class="control-group">
+        <label for="line4Input">Line 4</label>
+        <input type="text" id="line4Input" value="STOPS" />
+      </div>
+    </div>
+    <div class="row">
+      <div class="control-group">
+        <label for="leftBadgeInput">Left badge (use | )</label>
+        <input type="text" id="leftBadgeInput" value="THE|SUB|CLUB" />
+      </div>
+      <div class="control-group">
+        <label for="rightBadgeInput">Right badge (use | )</label>
+        <input type="text" id="rightBadgeInput" value="FRI|OCT|5TH" />
+      </div>
+    </div>
+    <div class="row">
+      <div class="control-group">
+        <label for="leftCreditInput">Bottom left</label>
+        <input type="text" id="leftCreditInput" value="JD TWITCH" />
+      </div>
+      <div class="control-group">
+        <label for="rightCreditInput">Bottom right</label>
+        <input type="text" id="rightCreditInput" value="JG WILKES" />
+      </div>
+    </div>
+
+    <h2>Fonts</h2>
+    <div class="row">
+      <div class="control-group">
+        <label for="headlineFontSelect">Headline font</label>
+        <select id="headlineFontSelect">
+          <option value="Anton" selected>Anton</option>
+          <option value="League Spartan">League Spartan</option>
+          <option value="Syne">Syne</option>
+          <option value="Arial Black">Arial Black</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label for="brandFontSelect">Brand font</label>
+        <select id="brandFontSelect">
+          <option value="Syne" selected>Syne</option>
+          <option value="Anton">Anton</option>
+          <option value="League Spartan">League Spartan</option>
+          <option value="Arial Black">Arial Black</option>
+        </select>
+      </div>
+    </div>
+    <div class="control-group">
+      <label for="accentFontSelect">Accent font</label>
+      <select id="accentFontSelect">
+        <option value="League Spartan" selected>League Spartan</option>
+        <option value="Syne">Syne</option>
+        <option value="Anton">Anton</option>
+        <option value="Arial Black">Arial Black</option>
+      </select>
+    </div>
+
+    <h2>Colors</h2>
+    <div class="row">
+      <div class="control-group">
+        <label for="bgColorInput">Background color</label>
+        <div class="color-wrap"><input type="color" id="bgColorInput" value="#d8a5b2" /></div>
+      </div>
+      <div class="control-group">
+        <label for="inkColorInput">Text / graphic color</label>
+        <div class="color-wrap"><input type="color" id="inkColorInput" value="#111111" /></div>
+      </div>
+    </div>
+
+    <h2>Insert Image</h2>
+    <div class="control-group">
+      <label for="imageUploadInput">Upload image</label>
+      <input type="file" id="imageUploadInput" accept="image/*" />
+    </div>
+    <div class="control-group">
+      <label for="imageSizeInput">Image size</label>
+      <input type="range" id="imageSizeInput" min="80" max="500" value="220" />
+    </div>
+    <div class="control-group">
+      <label for="imageOpacityInput">Image opacity</label>
+      <input type="range" id="imageOpacityInput" min="0" max="100" value="90" />
+    </div>
+    <div class="control-group">
+      <label for="imageYInput">Image vertical position</label>
+      <input type="range" id="imageYInput" min="100" max="720" value="405" />
+    </div>
+
+    <h2>Sizes & Spacing</h2>
+    <div class="control-group">
+      <label for="topSizeInput">Top text size</label>
+      <input type="range" id="topSizeInput" min="14" max="34" value="18" />
+    </div>
+    <div class="control-group">
+      <label for="brandSizeInput">Brand size</label>
+      <input type="range" id="brandSizeInput" min="42" max="92" value="56" />
+    </div>
+    <div class="control-group">
+      <label for="headlineSizeInput">Headline size</label>
+      <input type="range" id="headlineSizeInput" min="90" max="190" value="147" />
+    </div>
+    <div class="control-group">
+      <label for="headlineGapInput">Headline gap</label>
+      <input type="range" id="headlineGapInput" min="0" max="34" value="14" />
+    </div>
+    <div class="control-group">
+      <label for="badgeSizeInput">Badge size</label>
+      <input type="range" id="badgeSizeInput" min="10" max="28" value="12" />
+    </div>
+    <div class="control-group">
+      <label for="bottomSizeInput">Bottom text size</label>
+      <input type="range" id="bottomSizeInput" min="14" max="34" value="15" />
+    </div>
+    <div class="control-group">
+      <label for="badgeTiltInput">Badge tilt</label>
+      <input type="range" id="badgeTiltInput" min="0" max="18" value="6" />
+    </div>
+    <div class="control-group">
+      <label for="topTiltInput">Top text tilt</label>
+      <input type="range" id="topTiltInput" min="-20" max="20" value="0" />
+    </div>
+    <div class="control-group">
+      <label for="topArcInput">Top text arc</label>
+      <input type="range" id="topArcInput" min="0" max="22" value="12" />
+    </div>
+    <div class="control-group">
+      <label for="bottomTiltInput">Bottom text tilt</label>
+      <input type="range" id="bottomTiltInput" min="0" max="20" value="5" />
+    </div>
+    <div class="control-group">
+      <label for="bottomArcInput">Bottom text arc</label>
+      <input type="range" id="bottomArcInput" min="0" max="18" value="8" />
+    </div>
+
+    <h2>Export Poster</h2>
+    <div class="export-row">
+      <button class="export-button primary" id="downloadSvgBtn" type="button">Download SVG</button>
+      <button class="export-button" id="savePdfBtn" type="button">Download PDF</button>
+    </div>
+    <div class="small-note">SVG downloads directly as editable vector artwork. PDF now downloads directly as a valid single-page PDF. For Illustrator editing, use the SVG version.</div>
+
+    <div class="small-note">Tip: keep the background light and the ink dark for the original look.</div>
+  </aside>
+
+  <main class="poster-canvas" id="poster">
+    <img id="posterImage" class="poster-image" alt="Inserted poster image" />
+    <header class="top-sub-header" id="topHeader">THE G.D. DISCO BAND &amp;</header>
+
+    <div class="brandmark-header" id="brandHeader">OPTIMO</div>
+
+    <section class="headline-stack" id="headlineStack">
+      <div class="headline-row" id="row1">UNTIL</div>
+
+      <div class="row-middle-container">
+        <div class="flank-badge left" id="badgeLeft">
+          <span>T H E</span>
+          <span>S U B</span>
+          <span>C L U B</span>
+        </div>
+
+        <div class="headline-row" id="row2">THE</div>
+
+        <div class="flank-badge right" id="badgeRight">
+          <span>F R I</span>
+          <span>O C T</span>
+          <span>5 T H</span>
+        </div>
+      </div>
+
+      <div class="headline-row" id="row3">MUSIC</div>
+
+      <div class="row-stops-container">
+        
+        <div class="headline-row" id="row4">STOPS</div>
+      </div>
+    </section>
+
+    <footer class="bottom-credits">
+      <div class="credit-left" id="creditLeft">JD TWITCH</div>
+      <div class="credit-right" id="creditRight">JG WILKES</div>
+    </footer>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const topTextInput = $('topTextInput');
+    const brandTextInput = $('brandTextInput');
+    const line1Input = $('line1Input');
+    const line2Input = $('line2Input');
+    const line3Input = $('line3Input');
+    const line4Input = $('line4Input');
+    const leftBadgeInput = $('leftBadgeInput');
+    const rightBadgeInput = $('rightBadgeInput');
+    const leftCreditInput = $('leftCreditInput');
+    const rightCreditInput = $('rightCreditInput');
+
+    const headlineFontSelect = $('headlineFontSelect');
+    const brandFontSelect = $('brandFontSelect');
+    const accentFontSelect = $('accentFontSelect');
+
+    const bgColorInput = $('bgColorInput');
+    const inkColorInput = $('inkColorInput');
+    const imageUploadInput = $('imageUploadInput');
+    const imageSizeInput = $('imageSizeInput');
+    const imageOpacityInput = $('imageOpacityInput');
+    const imageYInput = $('imageYInput');
+
+    const topSizeInput = $('topSizeInput');
+    const brandSizeInput = $('brandSizeInput');
+    const headlineSizeInput = $('headlineSizeInput');
+    const headlineGapInput = $('headlineGapInput');
+    const badgeSizeInput = $('badgeSizeInput');
+    const bottomSizeInput = $('bottomSizeInput');
+    const badgeTiltInput = $('badgeTiltInput');
+    const topTiltInput = $('topTiltInput');
+    const topArcInput = $('topArcInput');
+    const bottomTiltInput = $('bottomTiltInput');
+    const bottomArcInput = $('bottomArcInput');
+
+    const topHeader = $('topHeader');
+    const brandHeader = $('brandHeader');
+    const row1 = $('row1');
+    const row2 = $('row2');
+    const row3 = $('row3');
+    const row4 = $('row4');
+    const badgeLeft = $('badgeLeft');
+    const badgeRight = $('badgeRight');
+    const creditLeft = $('creditLeft');
+    const creditRight = $('creditRight');
+    const headlineStack = $('headlineStack');
+    const posterImage = $('posterImage');
+    const downloadSvgBtn = $('downloadSvgBtn');
+    const savePdfBtn = $('savePdfBtn');
+
+    function cleanText(value) {
+      return value.toUpperCase();
+    }
+
+    function renderTopText(value) {
+      const text = cleanText(value);
+      topHeader.innerHTML = '';
+
+      const chars = [...text];
+      const letterIndexes = chars
+        .map((ch, i) => ch === ' ' ? null : i)
+        .filter(i => i !== null);
+      const totalLetters = Math.max(letterIndexes.length, 1);
+      let letterPosition = 0;
+      const arc = Number(topArcInput.value || 12);
+
+      chars.forEach((ch) => {
+        if (ch === ' ') {
+          const spacer = document.createElement('span');
+          spacer.className = 'top-space';
+          topHeader.appendChild(spacer);
+          return;
+        }
+
+        const span = document.createElement('span');
+        span.className = 'top-letter';
+        span.textContent = ch;
+
+        const t = totalLetters === 1 ? 0.5 : letterPosition / (totalLetters - 1);
+        // Ends sit lower while the center rises, matching the reference arc.
+        const y = arc * Math.pow(Math.abs((t - 0.5) * 2), 1.65);
+        // Letters follow the tangent of the arc: left leans left, right leans right.
+        const rotation = -16 + (32 * t);
+        span.style.transform = `translateY(${y.toFixed(1)}px) rotate(${rotation.toFixed(1)}deg)`;
+        topHeader.appendChild(span);
+        letterPosition++;
+      });
+    }
+
+    function renderBottomText(container, value, direction) {
+      const text = cleanText(value);
+      container.innerHTML = '';
+
+      const chars = [...text];
+      const totalLetters = Math.max(chars.filter(ch => ch !== ' ').length, 1);
+      let letterPosition = 0;
+      const arc = Number(bottomArcInput.value || 8);
+
+      chars.forEach((ch) => {
+        if (ch === ' ') {
+          const spacer = document.createElement('span');
+          spacer.className = 'bottom-space';
+          container.appendChild(spacer);
+          return;
+        }
+
+        const span = document.createElement('span');
+        span.className = 'bottom-letter';
+        span.textContent = ch;
+
+        const t = totalLetters === 1 ? 0.5 : letterPosition / (totalLetters - 1);
+        const y = arc * Math.pow(Math.abs((t - 0.5) * 2), 1.55);
+        let rotation;
+        if (direction === 'left') {
+          rotation = -14 + (26 * t);
+        } else {
+          rotation = -26 + (14 * t);
+        }
+        span.style.transform = `translateY(${y.toFixed(1)}px) rotate(${rotation.toFixed(1)}deg)`;
+        container.appendChild(span);
+        letterPosition++;
+      });
+    }
+
+    function updateBadgeContent(badgeEl, value) {
+      const parts = value.split('|');
+      badgeEl.innerHTML = '';
+      parts.forEach(part => {
+        const span = document.createElement('span');
+        span.textContent = cleanText(part.trim());
+        badgeEl.appendChild(span);
+      });
+    }
+
+    function applyFonts() {
+      const headlineFont = headlineFontSelect.value;
+      const brandFont = brandFontSelect.value;
+      const accentFont = accentFontSelect.value;
+
+      document.documentElement.style.setProperty('--font-headline', `'${headlineFont}', sans-serif`);
+      document.documentElement.style.setProperty('--font-brand', `'${brandFont}', sans-serif`);
+      document.documentElement.style.setProperty('--font-accent', `'${accentFont}', sans-serif`);
+    }
+
+    function applyColors() {
+      document.documentElement.style.setProperty('--bg-color', bgColorInput.value);
+      document.documentElement.style.setProperty('--ink-color', inkColorInput.value);
+    }
+
+    function applyImage() {
+      posterImage.style.width = imageSizeInput.value + 'px';
+      posterImage.style.opacity = (imageOpacityInput.value / 100).toString();
+      posterImage.style.top = imageYInput.value + 'px';
+    }
+
+    function applySizes() {
+      topHeader.style.fontSize = topSizeInput.value + 'px';
+      brandHeader.style.fontSize = brandSizeInput.value + 'px';
+      brandHeader.style.transform = 'scaleX(1.18)';
+
+      [row1, row2, row3, row4].forEach(row => {
+        row.style.fontSize = headlineSizeInput.value + 'px';
+      });
+
+      headlineStack.style.gap = headlineGapInput.value + 'px';
+      badgeLeft.style.fontSize = badgeSizeInput.value + 'px';
+      badgeRight.style.fontSize = badgeSizeInput.value + 'px';
+      creditLeft.style.fontSize = bottomSizeInput.value + 'px';
+      creditRight.style.fontSize = bottomSizeInput.value + 'px';
+      topHeader.style.transform = `rotate(${topTiltInput.value}deg)`;
+      renderTopText(topTextInput.value);
+
+      const tilt = badgeTiltInput.value;
+      badgeLeft.style.transform = `rotate(-${tilt}deg)`;
+      badgeRight.style.transform = `rotate(${tilt}deg)`;
+
+      const bottomTilt = bottomTiltInput.value;
+      creditLeft.style.transform = `rotate(-${bottomTilt}deg)`;
+      creditRight.style.transform = `rotate(${bottomTilt}deg)`;
+    }
+
+    function applyText() {
+      renderTopText(topTextInput.value);
+      brandHeader.textContent = cleanText(brandTextInput.value);
+      row1.textContent = cleanText(line1Input.value);
+      row2.textContent = cleanText(line2Input.value);
+      row3.textContent = cleanText(line3Input.value);
+      row4.textContent = cleanText(line4Input.value);
+      renderBottomText(creditLeft, leftCreditInput.value, 'left');
+      renderBottomText(creditRight, rightCreditInput.value, 'right');
+      updateBadgeContent(badgeLeft, leftBadgeInput.value);
+      updateBadgeContent(badgeRight, rightBadgeInput.value);
+    }
+
+
+    function escapeXml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+    }
+
+    function svgFontFamily(selectValue) {
+      if (selectValue === 'Anton') return 'Anton, Impact, sans-serif';
+      if (selectValue === 'Syne') return 'Syne, Arial, sans-serif';
+      if (selectValue === 'League Spartan') return 'League Spartan, Arial, sans-serif';
+      if (selectValue === 'Arial Black') return 'Arial Black, Arial, sans-serif';
+      return 'Arial, sans-serif';
+    }
+
+    function rectRelativeToPoster(element) {
+      const posterRect = poster.getBoundingClientRect();
+      const r = element.getBoundingClientRect();
+      const sx = 540 / posterRect.width;
+      const sy = 810 / posterRect.height;
+      return {
+        x: (r.left - posterRect.left) * sx,
+        y: (r.top - posterRect.top) * sy,
+        width: r.width * sx,
+        height: r.height * sy,
+        cx: (r.left - posterRect.left + r.width / 2) * sx,
+        cy: (r.top - posterRect.top + r.height / 2) * sy
+      };
+    }
+
+    function getRotationDeg(element) {
+      const transform = getComputedStyle(element).transform;
+      if (!transform || transform === 'none') return 0;
+      const match = transform.match(/^matrix\(([^)]+)\)$/);
+      if (!match) return 0;
+      const parts = match[1].split(',').map(Number);
+      if (parts.length < 2) return 0;
+      return Math.atan2(parts[1], parts[0]) * 180 / Math.PI;
+    }
+
+    function textElementSvg(element, options = {}) {
+      const r = rectRelativeToPoster(element);
+      const style = getComputedStyle(element);
+      const fontSize = parseFloat(style.fontSize) * (540 / poster.getBoundingClientRect().width);
+      const weight = style.fontWeight || '700';
+      const fill = inkColorInput.value;
+      const anchor = options.anchor || 'middle';
+      const x = options.x ?? r.cx;
+      const y = options.y ?? (r.y + r.height * 0.82);
+      const rotation = options.rotation ?? getRotationDeg(element);
+      const family = options.fontFamily || style.fontFamily || 'Arial, sans-serif';
+      const italic = style.fontStyle === 'italic' ? 'italic' : 'normal';
+      const letterSpacing = parseFloat(style.letterSpacing);
+      const ls = Number.isFinite(letterSpacing) ? letterSpacing * (540 / poster.getBoundingClientRect().width) : 0;
+
+      return `<text x="${x.toFixed(2)}" y="${y.toFixed(2)}" text-anchor="${anchor}" ` +
+        `font-family="${escapeXml(family)}" font-size="${fontSize.toFixed(2)}" font-weight="${escapeXml(weight)}" ` +
+        `font-style="${italic}" letter-spacing="${ls.toFixed(2)}" fill="${fill}" ` +
+        `transform="rotate(${rotation.toFixed(2)} ${x.toFixed(2)} ${y.toFixed(2)})">${escapeXml(element.textContent)}</text>`;
+    }
+
+    function buildPosterSvg() {
+      const bg = bgColorInput.value;
+      const fg = inkColorInput.value;
+      const headlineFont = svgFontFamily(headlineFontSelect.value);
+      const brandFont = svgFontFamily(brandFontSelect.value);
+      const accentFont = svgFontFamily(accentFontSelect.value);
+
+      const parts = [];
+      parts.push(`<?xml version="1.0" encoding="UTF-8"?>`);
+      parts.push(`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="540" height="810" viewBox="0 0 540 810">`);
+      parts.push(`<rect width="540" height="810" fill="${bg}"/>`);
+
+      if (posterImage.src && posterImage.style.display !== 'none') {
+        const ir = rectRelativeToPoster(posterImage);
+        const opacity = Number(getComputedStyle(posterImage).opacity || 1);
+        parts.push(`<image href="${escapeXml(posterImage.src)}" x="${ir.x.toFixed(2)}" y="${ir.y.toFixed(2)}" width="${ir.width.toFixed(2)}" height="${ir.height.toFixed(2)}" preserveAspectRatio="xMidYMid meet" opacity="${opacity.toFixed(3)}"/>`);
+      }
+
+      // Top letters: preserve the custom per-letter arc/rotation.
+      [...topHeader.children].forEach(child => {
+        if (!child.classList.contains('top-letter')) return;
+        parts.push(textElementSvg(child, {fontFamily: accentFont}));
+      });
+
+      parts.push(textElementSvg(brandHeader, {fontFamily: brandFont}));
+      parts.push(textElementSvg(row1, {fontFamily: headlineFont}));
+      parts.push(textElementSvg(row2, {fontFamily: headlineFont}));
+      parts.push(textElementSvg(row3, {fontFamily: headlineFont}));
+      parts.push(textElementSvg(row4, {fontFamily: headlineFont}));
+
+      // Side badges.
+      [...badgeLeft.querySelectorAll('span')].forEach(el => {
+        parts.push(textElementSvg(el, {fontFamily: accentFont, rotation: getRotationDeg(badgeLeft)}));
+      });
+      [...badgeRight.querySelectorAll('span')].forEach(el => {
+        parts.push(textElementSvg(el, {fontFamily: accentFont, rotation: getRotationDeg(badgeRight)}));
+      });
+
+      // Bottom credits: preserve per-letter curve and container tilt.
+      const leftTilt = getRotationDeg(creditLeft);
+      const rightTilt = getRotationDeg(creditRight);
+      [...creditLeft.children].forEach(child => {
+        if (!child.classList.contains('bottom-letter')) return;
+        parts.push(textElementSvg(child, {fontFamily: accentFont, rotation: getRotationDeg(child) + leftTilt}));
+      });
+      [...creditRight.children].forEach(child => {
+        if (!child.classList.contains('bottom-letter')) return;
+        parts.push(textElementSvg(child, {fontFamily: accentFont, rotation: getRotationDeg(child) + rightTilt}));
+      });
+
+      parts.push(`</svg>`);
+      return parts.join('\n');
+    }
+
+    function downloadTextFile(filename, content, mimeType) {
+      const blob = new Blob([content], {type: mimeType});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    downloadSvgBtn.addEventListener('click', () => {
+      const svg = buildPosterSvg();
+      downloadTextFile('poster.svg', svg, 'image/svg+xml;charset=utf-8');
+    });
+
+    function dataUrlToBytes(dataUrl) {
+      const base64 = dataUrl.split(',')[1];
+      const binary = atob(base64);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      return bytes;
+    }
+
+    function asciiBytes(text) {
+      return new TextEncoder().encode(text);
+    }
+
+    function concatBytes(chunks) {
+      const total = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+      const output = new Uint8Array(total);
+      let offset = 0;
+      chunks.forEach(chunk => {
+        output.set(chunk, offset);
+        offset += chunk.length;
+      });
+      return output;
+    }
+
+    function makePdfFromJpeg(jpegBytes, imageWidth, imageHeight) {
+      const pageWidth = 540;
+      const pageHeight = 810;
+      const objects = [];
+
+      objects[1] = asciiBytes('1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
+      objects[2] = asciiBytes('2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n');
+      objects[3] = asciiBytes(`3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>\nendobj\n`);
+      objects[4] = concatBytes([
+        asciiBytes(`4 0 obj\n<< /Type /XObject /Subtype /Image /Width ${imageWidth} /Height ${imageHeight} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpegBytes.length} >>\nstream\n`),
+        jpegBytes,
+        asciiBytes('\nendstream\nendobj\n')
+      ]);
+
+      const pageContent = `q\n${pageWidth} 0 0 ${pageHeight} 0 0 cm\n/Im0 Do\nQ\n`;
+      const pageContentBytes = asciiBytes(pageContent);
+      objects[5] = concatBytes([
+        asciiBytes(`5 0 obj\n<< /Length ${pageContentBytes.length} >>\nstream\n`),
+        pageContentBytes,
+        asciiBytes('endstream\nendobj\n')
+      ]);
+
+      const header = asciiBytes('%PDF-1.4\n%PDFGEN\n');
+      const chunks = [header];
+      const offsets = [0];
+      let currentOffset = header.length;
+
+      for (let i = 1; i <= 5; i++) {
+        offsets[i] = currentOffset;
+        chunks.push(objects[i]);
+        currentOffset += objects[i].length;
+      }
+
+      const xrefOffset = currentOffset;
+      let xref = 'xref\n0 6\n0000000000 65535 f \n';
+      for (let i = 1; i <= 5; i++) xref += String(offsets[i]).padStart(10, '0') + ' 00000 n \n';
+      const trailer = `${xref}trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+      chunks.push(asciiBytes(trailer));
+      return concatBytes(chunks);
+    }
+
+    async function renderPosterToJpeg() {
+      const svgString = buildPosterSvg();
+      const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+      const svgUrl = URL.createObjectURL(svgBlob);
+      try {
+        const img = await new Promise((resolve, reject) => {
+          const image = new Image();
+          image.onload = () => resolve(image);
+          image.onerror = () => reject(new Error('Could not render poster for PDF export.'));
+          image.src = svgUrl;
+        });
+
+        const scale = 3;
+        const canvas = document.createElement('canvas');
+        canvas.width = 540 * scale;
+        canvas.height = 810 * scale;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = bgColorInput.value;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const jpegDataUrl = canvas.toDataURL('image/jpeg', 0.96);
+        return { bytes: dataUrlToBytes(jpegDataUrl), width: canvas.width, height: canvas.height };
+      } finally {
+        URL.revokeObjectURL(svgUrl);
+      }
+    }
+
+    savePdfBtn.addEventListener('click', async () => {
+      const originalText = savePdfBtn.textContent;
+      savePdfBtn.disabled = true;
+      savePdfBtn.textContent = 'Building PDF...';
+      try {
+        if (document.fonts && document.fonts.ready) await document.fonts.ready;
+        const jpeg = await renderPosterToJpeg();
+        const pdfBytes = makePdfFromJpeg(jpeg.bytes, jpeg.width, jpeg.height);
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'poster.pdf';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+      } catch (error) {
+        console.error(error);
+        alert('PDF export could not be completed in this browser. The SVG export will still work.');
+      } finally {
+        savePdfBtn.disabled = false;
+        savePdfBtn.textContent = originalText;
+      }
+    });
+
+    function updateAll() {
+      applyText();
+      applyFonts();
+      applyColors();
+      applySizes();
+      applyImage();
+    }
+
+    imageUploadInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        posterImage.src = event.target.result;
+        posterImage.style.display = 'block';
+        applyImage();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    [
+      topTextInput, brandTextInput, line1Input, line2Input, line3Input, line4Input,
+      leftBadgeInput, rightBadgeInput, leftCreditInput, rightCreditInput,
+      headlineFontSelect, brandFontSelect, accentFontSelect,
+      bgColorInput, inkColorInput,
+      imageSizeInput, imageOpacityInput, imageYInput,
+      topSizeInput, brandSizeInput, headlineSizeInput, headlineGapInput,
+      badgeSizeInput, bottomSizeInput, badgeTiltInput, topTiltInput, topArcInput, bottomTiltInput, bottomArcInput
+    ].forEach(input => input.addEventListener('input', updateAll));
+
+    updateAll();
+  </script>
+</body>
+</html>
