@@ -1,0 +1,2092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Poster Generator — Optimo Inspired</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Barlow+Condensed:wght@700;800;900&family=Bebas+Neue&family=League+Spartan:wght@700;800;900&family=Oswald:wght@600;700&family=Space+Grotesk:wght@600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-color: #d8a5b2;
+      --ink-color: #111111;
+      --font-headline: 'Anton', sans-serif;
+      --font-brand: 'Syne', sans-serif;
+      --font-accent: 'League Spartan', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #181818;
+      color: #f1f1f1;
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      gap: 28px;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .controls-panel {
+      width: 360px;
+      background: #262626;
+      border: 1px solid #3b3b3b;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-height: calc(100vh - 48px);
+      overflow: auto;
+    }
+
+    .controls-panel h1 {
+      font-size: 1.1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    .controls-panel p {
+      color: #a8a8a8;
+      font-size: 0.86rem;
+      line-height: 1.35;
+    }
+
+    .controls-panel h2 {
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #c9c9c9;
+      padding-top: 8px;
+      border-top: 1px solid #3b3b3b;
+      margin-top: 4px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    label {
+      color: #bdbdbd;
+      font-size: 0.82rem;
+    }
+
+    input[type="text"], select {
+      width: 100%;
+      background: #151515;
+      border: 1px solid #454545;
+      color: white;
+      padding: 9px 10px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      background: #151515;
+      border: 1px solid #454545;
+      color: white;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 0.86rem;
+    }
+
+    input[type="range"], input[type="color"] {
+      width: 100%;
+      accent-color: #d8a5b2;
+    }
+
+    .color-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #151515;
+      border: 1px solid #454545;
+      border-radius: 6px;
+      padding: 6px 8px;
+    }
+
+    .small-note {
+      font-size: 0.75rem;
+      color: #8d8d8d;
+      line-height: 1.35;
+    }
+
+    .export-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .export-button {
+      border: 1px solid #505050;
+      background: #161616;
+      color: #fff;
+      border-radius: 7px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: 0.18s ease;
+    }
+
+    .export-button:hover {
+      background: #303030;
+      border-color: #777;
+    }
+
+    .export-button.primary {
+      background: #f2f2f2;
+      color: #111;
+      border-color: #f2f2f2;
+    }
+
+    .export-button.primary:hover {
+      background: #fff;
+    }
+
+    .mini-action-button {
+      border: 1px solid #505050;
+      background: #161616;
+      color: #fff;
+      border-radius: 7px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: 0.18s ease;
+      width: 100%;
+    }
+
+    .mini-action-button:hover {
+      background: #303030;
+      border-color: #777;
+    }
+
+    @media print {
+      html,
+      body {
+        width: 540px !important;
+        height: 810px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        background: transparent !important;
+      }
+
+      body {
+        display: block !important;
+      }
+
+      .controls-panel {
+        display: none !important;
+      }
+
+      .poster-canvas {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 540px !important;
+        height: 810px !important;
+        min-width: 540px !important;
+        min-height: 810px !important;
+        max-width: 540px !important;
+        max-height: 810px !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        overflow: hidden !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      .text-transform-box {
+        display: none !important;
+      }
+
+      @page {
+        size: 5.625in 8.4375in;
+        margin: 0;
+      }
+    }
+
+    .poster-canvas {
+      position: relative;
+      width: 540px;
+      height: 810px;
+      background: var(--bg-color);
+      color: var(--ink-color);
+      padding: 40px 32px 36px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+      user-select: none;
+      isolation: isolate;
+    }
+
+    .poster-image {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      max-width: none;
+      width: 220px;
+      opacity: 0.9;
+      display: none;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .top-sub-header {
+      position: relative;
+      z-index: 2;
+      width: 94%;
+      height: 42px;
+      margin: 0 auto;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 7px;
+      text-align: center;
+      font-family: var(--font-accent);
+      font-weight: 900;
+      font-style: normal;
+      text-transform: uppercase;
+      line-height: 1;
+      transform: rotate(0deg);
+      transform-origin: center center;
+      white-space: nowrap;
+    }
+
+    .top-sub-header .top-letter {
+      display: inline-block;
+      flex: 0 0 auto;
+      transform-origin: center center;
+    }
+
+    .top-sub-header .top-space {
+      display: inline-block;
+      flex: 0 0 13px;
+      width: 13px;
+    }
+
+    .brandmark-header {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      text-align: center;
+      font-family: var(--font-brand);
+      font-weight: 800;
+      text-transform: uppercase;
+      line-height: .9;
+      transform-origin: center;
+    }
+
+    .headline-stack {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      line-height: .9;
+      position: relative;
+      margin-top: -6px;
+    }
+
+    .headline-row {
+      font-family: var(--font-headline);
+      font-weight: 400;
+      text-transform: uppercase;
+      color: var(--ink-color);
+      text-align: center;
+      line-height: .88;
+      letter-spacing: -0.02em;
+    }
+
+    .row-middle-container,
+    .row-stops-container {
+      width: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .flank-badge {
+      position: absolute;
+      font-family: var(--font-accent);
+      font-weight: 900;
+      font-style: italic;
+      text-transform: uppercase;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      letter-spacing: .28em;
+      white-space: nowrap;
+    }
+
+    .flank-badge.left { left: 4px; transform: rotate(-7deg); }
+    .flank-badge.right { right: 4px; transform: rotate(7deg); }
+    .flank-badge span { display:block; margin: 2px 0; }
+
+
+    .bottom-credits {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      font-family: var(--font-accent);
+      font-weight: 900;
+      font-style: italic;
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      padding: 0 2px;
+    }
+
+    .credit-left,
+    .credit-right {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      white-space: nowrap;
+      transform-origin: center center;
+    }
+
+    .bottom-letter {
+      display: inline-block;
+      flex: 0 0 auto;
+      transform-origin: center center;
+      line-height: 1;
+    }
+
+    .bottom-space {
+      display: inline-block;
+      flex: 0 0 12px;
+      width: 12px;
+    }
+
+    .credit-left { transform: rotate(-5deg); }
+    .credit-right { transform: rotate(5deg); }
+
+    .draggable-text {
+      cursor: grab;
+      touch-action: none;
+      -webkit-user-drag: none;
+    }
+
+    .draggable-text.dragging {
+      cursor: grabbing;
+      z-index: 20 !important;
+    }
+
+    .poster-canvas.drag-active {
+      cursor: grabbing;
+    }
+
+    .text-transform-box {
+      position: absolute;
+      display: none;
+      z-index: 100;
+      border: 1px dashed rgba(255, 255, 255, 0.88);
+      outline: 1px dashed rgba(0, 0, 0, 0.55);
+      pointer-events: none;
+    }
+
+    .text-transform-box.active {
+      display: block;
+    }
+
+    .transform-handle {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #111;
+      background: #fff;
+      color: #111;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font: 700 11px/1 Arial, sans-serif;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .35);
+      pointer-events: auto;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .rotate-handle {
+      left: 50%;
+      top: -32px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      cursor: grab;
+    }
+
+    .rotate-handle::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 16px;
+      width: 1px;
+      height: 14px;
+      background: rgba(255,255,255,.9);
+      transform: translateX(-50%);
+      z-index: -1;
+    }
+
+    .resize-handle {
+      right: -10px;
+      bottom: -10px;
+      border-radius: 3px;
+      cursor: nwse-resize;
+    }
+
+    @media print {
+      .text-transform-box { display: none !important; }
+    }
+
+    @media (max-width: 1100px) {
+      body { flex-direction: column; align-items: center; }
+      .controls-panel { width: min(92vw, 700px); max-height: none; }
+      .poster-canvas { width: min(92vw, 540px); height: calc(min(92vw, 540px) * 1.5); }
+    }
+  </style>
+</head>
+<body>
+  <aside class="controls-panel">
+    <div>
+      <h1>Poster Generator</h1>
+      <p>Use this anytime to make an Optimo-style poster. Edit the text, fonts, sizes, colors, tilt, and even insert an image while keeping the original layout feel.</p>
+    </div>
+
+    <h2>Text</h2>
+    <div class="control-group">
+      <label for="topTextInput">Top text</label>
+      <input type="text" id="topTextInput" value="THE G.D. DISCO BAND &" />
+    </div>
+    <div class="control-group">
+      <label for="brandTextInput">Brand / header</label>
+      <input type="text" id="brandTextInput" value="OPTIMO" />
+    </div>
+    <div class="row">
+      <div class="control-group">
+        <label for="line1Input">Line 1</label>
+        <input type="text" id="line1Input" value="UNTIL" />
+      </div>
+      <div class="control-group">
+        <label for="line2Input">Line 2</label>
+        <input type="text" id="line2Input" value="THE" />
+      </div>
+    </div>
+    <div class="row">
+      <div class="control-group">
+        <label for="line3Input">Line 3</label>
+        <input type="text" id="line3Input" value="MUSIC" />
+      </div>
+      <div class="control-group">
+        <label for="line4Input">Line 4</label>
+        <input type="text" id="line4Input" value="STOPS" />
+      </div>
+    </div>
+    <div class="row">
+      <div class="control-group">
+        <label for="leftBadgeInput">Left badge (use | )</label>
+        <input type="text" id="leftBadgeInput" value="THE|SUB|CLUB" />
+      </div>
+      <div class="control-group">
+        <label for="rightBadgeInput">Right badge (use | )</label>
+        <input type="text" id="rightBadgeInput" value="FRI|OCT|5TH" />
+      </div>
+    </div>
+    <div class="row">
+      <div class="control-group">
+        <label for="leftCreditInput">Bottom left</label>
+        <input type="text" id="leftCreditInput" value="JD TWITCH" />
+      </div>
+      <div class="control-group">
+        <label for="rightCreditInput">Bottom right</label>
+        <input type="text" id="rightCreditInput" value="JG WILKES" />
+      </div>
+    </div>
+
+    <h2>Fonts</h2>
+    <div class="row">
+      <div class="control-group">
+        <label for="headlineFontSelect">Headline font</label>
+        <select id="headlineFontSelect">
+          <option value="Anton" selected>Anton</option>
+          <option value="League Spartan">League Spartan</option>
+          <option value="Syne">Syne</option>
+          <option value="Arial Black">Arial Black</option>
+          <option value="Bebas Neue">Bebas Neue</option>
+          <option value="Oswald">Oswald</option>
+          <option value="Barlow Condensed">Barlow Condensed</option>
+          <option value="Archivo Black">Archivo Black</option>
+          <option value="Space Grotesk">Space Grotesk</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label for="brandFontSelect">Brand font</label>
+        <select id="brandFontSelect">
+          <option value="Syne" selected>Syne</option>
+          <option value="Anton">Anton</option>
+          <option value="League Spartan">League Spartan</option>
+          <option value="Arial Black">Arial Black</option>
+          <option value="Bebas Neue">Bebas Neue</option>
+          <option value="Oswald">Oswald</option>
+          <option value="Barlow Condensed">Barlow Condensed</option>
+          <option value="Archivo Black">Archivo Black</option>
+          <option value="Space Grotesk">Space Grotesk</option>
+        </select>
+      </div>
+    </div>
+    <div class="control-group">
+      <label for="accentFontSelect">Accent font</label>
+      <select id="accentFontSelect">
+        <option value="League Spartan" selected>League Spartan</option>
+        <option value="Syne">Syne</option>
+        <option value="Anton">Anton</option>
+        <option value="Arial Black">Arial Black</option>
+        <option value="Bebas Neue">Bebas Neue</option>
+        <option value="Oswald">Oswald</option>
+        <option value="Barlow Condensed">Barlow Condensed</option>
+        <option value="Archivo Black">Archivo Black</option>
+        <option value="Space Grotesk">Space Grotesk</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label for="customFontFileInput">Import custom font file</label>
+      <input type="file" id="customFontFileInput" accept=".ttf,.otf,.woff,.woff2,font/*" />
+    </div>
+    <div class="control-group">
+      <label for="customFontNameInput">Custom font name</label>
+      <input type="text" id="customFontNameInput" placeholder="Example: My Custom Font" />
+    </div>
+    <div class="control-group">
+      <button class="mini-action-button" id="addCustomFontBtn" type="button">Add Custom Font</button>
+    </div>
+    <div class="small-note">Upload a .ttf, .otf, .woff, or .woff2 file. After you add it, it appears in all three font menus and can also export with the SVG.</div>
+
+    <h2>Colors</h2>
+    <div class="row">
+      <div class="control-group">
+        <label for="bgColorInput">Background color</label>
+        <div class="color-wrap"><input type="color" id="bgColorInput" value="#d8a5b2" /></div>
+      </div>
+      <div class="control-group">
+        <label for="inkColorInput">Text / graphic color</label>
+        <div class="color-wrap"><input type="color" id="inkColorInput" value="#111111" /></div>
+      </div>
+    </div>
+
+    <h2>Insert Image</h2>
+    <div class="control-group">
+      <label for="imageUploadInput">Upload image</label>
+      <input type="file" id="imageUploadInput" accept="image/*" />
+    </div>
+    <div class="control-group">
+      <label for="imageSizeInput">Image size</label>
+      <input type="range" id="imageSizeInput" min="80" max="500" value="220" />
+    </div>
+    <div class="control-group">
+      <label for="imageOpacityInput">Image opacity</label>
+      <input type="range" id="imageOpacityInput" min="0" max="100" value="90" />
+    </div>
+    <div class="control-group">
+      <label for="imageYInput">Image vertical position</label>
+      <input type="range" id="imageYInput" min="100" max="720" value="405" />
+    </div>
+
+    <h2>Sizes & Spacing</h2>
+    <div class="control-group">
+      <label for="topSizeInput">Top text size</label>
+      <input type="range" id="topSizeInput" min="14" max="34" value="18" />
+    </div>
+    <div class="control-group">
+      <label for="brandSizeInput">Brand size</label>
+      <input type="range" id="brandSizeInput" min="42" max="92" value="56" />
+    </div>
+    <div class="control-group">
+      <label for="headlineSizeInput">Headline size</label>
+      <input type="range" id="headlineSizeInput" min="90" max="190" value="147" />
+    </div>
+    <div class="control-group">
+      <label for="headlineGapInput">Headline gap</label>
+      <input type="range" id="headlineGapInput" min="0" max="34" value="14" />
+    </div>
+    <div class="control-group">
+      <label for="badgeSizeInput">Badge size</label>
+      <input type="range" id="badgeSizeInput" min="10" max="28" value="12" />
+    </div>
+    <div class="control-group">
+      <label for="bottomSizeInput">Bottom text size</label>
+      <input type="range" id="bottomSizeInput" min="14" max="34" value="15" />
+    </div>
+    <div class="control-group">
+      <label for="badgeTiltInput">Badge tilt</label>
+      <input type="range" id="badgeTiltInput" min="0" max="18" value="6" />
+    </div>
+    <div class="control-group">
+      <label for="topTiltInput">Top text tilt</label>
+      <input type="range" id="topTiltInput" min="-20" max="20" value="0" />
+    </div>
+    <div class="control-group">
+      <label for="topArcInput">Top text arc</label>
+      <input type="range" id="topArcInput" min="0" max="22" value="12" />
+    </div>
+    <div class="control-group">
+      <label for="bottomTiltInput">Bottom text tilt</label>
+      <input type="range" id="bottomTiltInput" min="0" max="20" value="5" />
+    </div>
+    <div class="control-group">
+      <label for="bottomArcInput">Bottom text arc</label>
+      <input type="range" id="bottomArcInput" min="0" max="18" value="8" />
+    </div>
+
+    <h2>Move Text</h2>
+    <button class="export-button" id="resetTextPositionsBtn" type="button" style="width:100%;">Reset Text Positions</button>
+    <div class="small-note">Drag any text directly on the poster to move it anywhere you want.</div>
+
+    <h2>Random Poster</h2>
+    <button class="export-button primary" id="randomizeBtn" type="button" style="width:100%;">Randomize Poster</button>
+    <div class="small-note">Creates a new poster variation with different text, fonts, colors, sizes, spacing, arcs, tilts, badges, credits, and image placement while keeping the same generator structure.</div>
+
+    <h2>Export Poster</h2>
+    <div class="export-row">
+      <button class="export-button primary" id="downloadSvgBtn" type="button">Download SVG</button>
+      <button class="export-button" id="savePdfBtn" type="button">Download PDF</button>
+    </div>
+    <div class="small-note">SVG downloads directly as editable vector artwork. PDF uses the browser’s native print engine so the saved PDF matches the poster exactly. In the print window choose Save as PDF, set Scale to 100%, Margins to None, and enable Background graphics.</div>
+
+    <div class="small-note">Tip: keep the background light and the ink dark for the original look.</div>
+  </aside>
+
+  <main class="poster-canvas" id="poster">
+    <img id="posterImage" class="poster-image" alt="Inserted poster image" />
+    <div class="text-transform-box" id="textTransformBox" aria-hidden="true">
+      <div class="transform-handle rotate-handle" id="rotateTextHandle" title="Drag to rotate">↻</div>
+      <div class="transform-handle resize-handle" id="resizeTextHandle" title="Drag to resize">↘</div>
+    </div>
+    <header class="top-sub-header draggable-text" id="topHeader">THE G.D. DISCO BAND &amp;</header>
+
+    <div class="brandmark-header draggable-text" id="brandHeader">OPTIMO</div>
+
+    <section class="headline-stack" id="headlineStack">
+      <div class="headline-row draggable-text" id="row1">UNTIL</div>
+
+      <div class="row-middle-container">
+        <div class="flank-badge left draggable-text" id="badgeLeft">
+          <span>T H E</span>
+          <span>S U B</span>
+          <span>C L U B</span>
+        </div>
+
+        <div class="headline-row draggable-text" id="row2">THE</div>
+
+        <div class="flank-badge right draggable-text" id="badgeRight">
+          <span>F R I</span>
+          <span>O C T</span>
+          <span>5 T H</span>
+        </div>
+      </div>
+
+      <div class="headline-row draggable-text" id="row3">MUSIC</div>
+
+      <div class="row-stops-container">
+        
+        <div class="headline-row draggable-text" id="row4">STOPS</div>
+      </div>
+    </section>
+
+    <footer class="bottom-credits">
+      <div class="credit-left draggable-text" id="creditLeft">JD TWITCH</div>
+      <div class="credit-right draggable-text" id="creditRight">JG WILKES</div>
+    </footer>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const topTextInput = $('topTextInput');
+    const brandTextInput = $('brandTextInput');
+    const line1Input = $('line1Input');
+    const line2Input = $('line2Input');
+    const line3Input = $('line3Input');
+    const line4Input = $('line4Input');
+    const leftBadgeInput = $('leftBadgeInput');
+    const rightBadgeInput = $('rightBadgeInput');
+    const leftCreditInput = $('leftCreditInput');
+    const rightCreditInput = $('rightCreditInput');
+
+    const headlineFontSelect = $('headlineFontSelect');
+    const brandFontSelect = $('brandFontSelect');
+    const accentFontSelect = $('accentFontSelect');
+    const customFontFileInput = $('customFontFileInput');
+    const customFontNameInput = $('customFontNameInput');
+    const addCustomFontBtn = $('addCustomFontBtn');
+
+    const bgColorInput = $('bgColorInput');
+    const inkColorInput = $('inkColorInput');
+    const imageUploadInput = $('imageUploadInput');
+    const imageSizeInput = $('imageSizeInput');
+    const imageOpacityInput = $('imageOpacityInput');
+    const imageYInput = $('imageYInput');
+
+    const topSizeInput = $('topSizeInput');
+    const brandSizeInput = $('brandSizeInput');
+    const headlineSizeInput = $('headlineSizeInput');
+    const headlineGapInput = $('headlineGapInput');
+    const badgeSizeInput = $('badgeSizeInput');
+    const bottomSizeInput = $('bottomSizeInput');
+    const badgeTiltInput = $('badgeTiltInput');
+    const topTiltInput = $('topTiltInput');
+    const topArcInput = $('topArcInput');
+    const bottomTiltInput = $('bottomTiltInput');
+    const bottomArcInput = $('bottomArcInput');
+
+    const topHeader = $('topHeader');
+    const brandHeader = $('brandHeader');
+    const row1 = $('row1');
+    const row2 = $('row2');
+    const row3 = $('row3');
+    const row4 = $('row4');
+    const badgeLeft = $('badgeLeft');
+    const badgeRight = $('badgeRight');
+    const creditLeft = $('creditLeft');
+    const creditRight = $('creditRight');
+    const headlineStack = $('headlineStack');
+    const posterImage = $('posterImage');
+    const textTransformBox = $('textTransformBox');
+    const rotateTextHandle = $('rotateTextHandle');
+    const resizeTextHandle = $('resizeTextHandle');
+    const resetTextPositionsBtn = $('resetTextPositionsBtn');
+    const randomizeBtn = $('randomizeBtn');
+    const downloadSvgBtn = $('downloadSvgBtn');
+    const savePdfBtn = $('savePdfBtn');
+
+    function cleanText(value) {
+      return value.toUpperCase();
+    }
+
+    function renderTopText(value) {
+      const text = cleanText(value);
+      topHeader.innerHTML = '';
+
+      const chars = [...text];
+      const letterIndexes = chars
+        .map((ch, i) => ch === ' ' ? null : i)
+        .filter(i => i !== null);
+      const totalLetters = Math.max(letterIndexes.length, 1);
+      let letterPosition = 0;
+      const arc = Number(topArcInput.value || 12);
+
+      chars.forEach((ch) => {
+        if (ch === ' ') {
+          const spacer = document.createElement('span');
+          spacer.className = 'top-space';
+          topHeader.appendChild(spacer);
+          return;
+        }
+
+        const span = document.createElement('span');
+        span.className = 'top-letter';
+        span.textContent = ch;
+
+        const t = totalLetters === 1 ? 0.5 : letterPosition / (totalLetters - 1);
+        // Ends sit lower while the center rises, matching the reference arc.
+        const y = arc * Math.pow(Math.abs((t - 0.5) * 2), 1.65);
+        // Letters follow the tangent of the arc: left leans left, right leans right.
+        const rotation = -16 + (32 * t);
+        span.style.transform = `translateY(${y.toFixed(1)}px) rotate(${rotation.toFixed(1)}deg)`;
+        topHeader.appendChild(span);
+        letterPosition++;
+      });
+    }
+
+    function renderBottomText(container, value, direction) {
+      const text = cleanText(value);
+      container.innerHTML = '';
+
+      const chars = [...text];
+      const totalLetters = Math.max(chars.filter(ch => ch !== ' ').length, 1);
+      let letterPosition = 0;
+      const arc = Number(bottomArcInput.value || 8);
+
+      chars.forEach((ch) => {
+        if (ch === ' ') {
+          const spacer = document.createElement('span');
+          spacer.className = 'bottom-space';
+          container.appendChild(spacer);
+          return;
+        }
+
+        const span = document.createElement('span');
+        span.className = 'bottom-letter';
+        span.textContent = ch;
+
+        const t = totalLetters === 1 ? 0.5 : letterPosition / (totalLetters - 1);
+        const y = arc * Math.pow(Math.abs((t - 0.5) * 2), 1.55);
+        let rotation;
+        if (direction === 'left') {
+          rotation = -14 + (26 * t);
+        } else {
+          rotation = -26 + (14 * t);
+        }
+        span.style.transform = `translateY(${y.toFixed(1)}px) rotate(${rotation.toFixed(1)}deg)`;
+        container.appendChild(span);
+        letterPosition++;
+      });
+    }
+
+    function updateBadgeContent(badgeEl, value) {
+      const parts = value.split('|');
+      badgeEl.innerHTML = '';
+      parts.forEach(part => {
+        const span = document.createElement('span');
+        span.textContent = cleanText(part.trim());
+        badgeEl.appendChild(span);
+      });
+    }
+
+    const customFonts = new Map();
+
+    function guessFontFormat(fileName) {
+      const name = String(fileName || '').toLowerCase();
+      if (name.endsWith('.woff2')) return 'woff2';
+      if (name.endsWith('.woff')) return 'woff';
+      if (name.endsWith('.otf')) return 'opentype';
+      if (name.endsWith('.ttf')) return 'truetype';
+      return 'truetype';
+    }
+
+    function sanitizeFontName(name) {
+      const cleaned = String(name || '').trim().replace(/\s+/g, ' ');
+      return cleaned || 'Custom Font';
+    }
+
+    function addFontOptionToSelect(selectEl, fontName) {
+      const exists = [...selectEl.options].some(option => option.value === fontName);
+      if (!exists) {
+        const option = document.createElement('option');
+        option.value = fontName;
+        option.textContent = fontName;
+        selectEl.appendChild(option);
+      }
+    }
+
+    function registerCustomFont(fontName, dataUrl, format) {
+      const safeName = sanitizeFontName(fontName);
+      const styleId = 'custom-font-style-' + safeName.replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+      let styleTag = document.getElementById(styleId);
+      if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = styleId;
+        document.head.appendChild(styleTag);
+      }
+      styleTag.textContent = `@font-face { font-family: '${safeName}'; src: url('${dataUrl}') format('${format}'); font-display: swap; }`;
+      customFonts.set(safeName, { dataUrl, format });
+      addFontOptionToSelect(headlineFontSelect, safeName);
+      addFontOptionToSelect(brandFontSelect, safeName);
+      addFontOptionToSelect(accentFontSelect, safeName);
+      return safeName;
+    }
+
+    function readFileAsDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('Could not read font file.'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function addCustomFontFromInput() {
+      const file = customFontFileInput.files && customFontFileInput.files[0];
+      if (!file) {
+        alert('Choose a font file first.');
+        return;
+      }
+      const typedName = sanitizeFontName(customFontNameInput.value);
+      const fallbackName = file.name.replace(/\.[^.]+$/, '');
+      const fontName = sanitizeFontName(typedName || fallbackName);
+      const originalText = addCustomFontBtn.textContent;
+      addCustomFontBtn.disabled = true;
+      addCustomFontBtn.textContent = 'Adding Font...';
+      try {
+        const dataUrl = await readFileAsDataUrl(file);
+        const format = guessFontFormat(file.name);
+        const finalName = registerCustomFont(fontName, dataUrl, format);
+        headlineFontSelect.value = finalName;
+        customFontNameInput.value = finalName;
+        updateAll();
+      } catch (error) {
+        console.error(error);
+        alert('That font could not be imported. Try another file type such as .ttf, .otf, .woff, or .woff2.');
+      } finally {
+        addCustomFontBtn.disabled = false;
+        addCustomFontBtn.textContent = originalText;
+      }
+    }
+
+    function applyFonts() {
+      const headlineFont = headlineFontSelect.value;
+      const brandFont = brandFontSelect.value;
+      const accentFont = accentFontSelect.value;
+
+      document.documentElement.style.setProperty('--font-headline', `'${headlineFont}', sans-serif`);
+      document.documentElement.style.setProperty('--font-brand', `'${brandFont}', sans-serif`);
+      document.documentElement.style.setProperty('--font-accent', `'${accentFont}', sans-serif`);
+    }
+
+    function applyColors() {
+      document.documentElement.style.setProperty('--bg-color', bgColorInput.value);
+      document.documentElement.style.setProperty('--ink-color', inkColorInput.value);
+    }
+
+    function applyImage() {
+      posterImage.style.width = imageSizeInput.value + 'px';
+      posterImage.style.opacity = (imageOpacityInput.value / 100).toString();
+      posterImage.style.top = imageYInput.value + 'px';
+    }
+
+    function applySizes() {
+      topHeader.style.fontSize = topSizeInput.value + 'px';
+      brandHeader.style.fontSize = brandSizeInput.value + 'px';
+      brandHeader.style.transform = 'scaleX(1.18)';
+
+      [row1, row2, row3, row4].forEach(row => {
+        row.style.fontSize = headlineSizeInput.value + 'px';
+      });
+
+      headlineStack.style.gap = headlineGapInput.value + 'px';
+      badgeLeft.style.fontSize = badgeSizeInput.value + 'px';
+      badgeRight.style.fontSize = badgeSizeInput.value + 'px';
+      creditLeft.style.fontSize = bottomSizeInput.value + 'px';
+      creditRight.style.fontSize = bottomSizeInput.value + 'px';
+      topHeader.style.transform = `rotate(${topTiltInput.value}deg)`;
+      renderTopText(topTextInput.value);
+
+      const tilt = badgeTiltInput.value;
+      badgeLeft.style.transform = `rotate(-${tilt}deg)`;
+      badgeRight.style.transform = `rotate(${tilt}deg)`;
+
+      const bottomTilt = bottomTiltInput.value;
+      creditLeft.style.transform = `rotate(-${bottomTilt}deg)`;
+      creditRight.style.transform = `rotate(${bottomTilt}deg)`;
+    }
+
+    function applyText() {
+      renderTopText(topTextInput.value);
+      brandHeader.textContent = cleanText(brandTextInput.value);
+      row1.textContent = cleanText(line1Input.value);
+      row2.textContent = cleanText(line2Input.value);
+      row3.textContent = cleanText(line3Input.value);
+      row4.textContent = cleanText(line4Input.value);
+      renderBottomText(creditLeft, leftCreditInput.value, 'left');
+      renderBottomText(creditRight, rightCreditInput.value, 'right');
+      updateBadgeContent(badgeLeft, leftBadgeInput.value);
+      updateBadgeContent(badgeRight, rightBadgeInput.value);
+    }
+
+
+    function escapeXml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+    }
+
+    function svgFontFamily(selectValue) {
+      if (customFonts.has(selectValue)) return `${selectValue}, Arial, sans-serif`;
+      if (selectValue === 'Anton') return 'Anton, Impact, sans-serif';
+      if (selectValue === 'Syne') return 'Syne, Arial, sans-serif';
+      if (selectValue === 'League Spartan') return 'League Spartan, Arial, sans-serif';
+      if (selectValue === 'Arial Black') return 'Arial Black, Arial, sans-serif';
+      if (selectValue === 'Bebas Neue') return 'Bebas Neue, Impact, sans-serif';
+      if (selectValue === 'Oswald') return 'Oswald, Arial Narrow, sans-serif';
+      if (selectValue === 'Barlow Condensed') return 'Barlow Condensed, Arial Narrow, sans-serif';
+      if (selectValue === 'Archivo Black') return 'Archivo Black, Arial Black, sans-serif';
+      if (selectValue === 'Space Grotesk') return 'Space Grotesk, Arial, sans-serif';
+      return 'Arial, sans-serif';
+    }
+
+    function rectRelativeToPoster(element) {
+      const posterRect = poster.getBoundingClientRect();
+      const r = element.getBoundingClientRect();
+      const sx = 540 / posterRect.width;
+      const sy = 810 / posterRect.height;
+      return {
+        x: (r.left - posterRect.left) * sx,
+        y: (r.top - posterRect.top) * sy,
+        width: r.width * sx,
+        height: r.height * sy,
+        cx: (r.left - posterRect.left + r.width / 2) * sx,
+        cy: (r.top - posterRect.top + r.height / 2) * sy
+      };
+    }
+
+    function getRotationDeg(element) {
+      const transform = getComputedStyle(element).transform;
+      if (!transform || transform === 'none') return 0;
+      const match = transform.match(/^matrix\(([^)]+)\)$/);
+      if (!match) return 0;
+      const parts = match[1].split(',').map(Number);
+      if (parts.length < 2) return 0;
+      return Math.atan2(parts[1], parts[0]) * 180 / Math.PI;
+    }
+
+    function textElementSvg(element, options = {}) {
+      const r = rectRelativeToPoster(element);
+      const style = getComputedStyle(element);
+      const manualScale = Number(options.manualScale || 1);
+      const fontSize = parseFloat(style.fontSize) * (540 / poster.getBoundingClientRect().width) * manualScale;
+      const weight = style.fontWeight || '700';
+      const fill = inkColorInput.value;
+      const anchor = options.anchor || 'middle';
+      const x = options.x ?? r.cx;
+      const y = options.y ?? (r.y + r.height * 0.82);
+      const rotation = options.rotation ?? getRotationDeg(element);
+      const family = options.fontFamily || style.fontFamily || 'Arial, sans-serif';
+      const italic = style.fontStyle === 'italic' ? 'italic' : 'normal';
+      const letterSpacing = parseFloat(style.letterSpacing);
+      const ls = Number.isFinite(letterSpacing) ? letterSpacing * (540 / poster.getBoundingClientRect().width) : 0;
+
+      return `<text x="${x.toFixed(2)}" y="${y.toFixed(2)}" text-anchor="${anchor}" ` +
+        `font-family="${escapeXml(family)}" font-size="${fontSize.toFixed(2)}" font-weight="${escapeXml(weight)}" ` +
+        `font-style="${italic}" letter-spacing="${ls.toFixed(2)}" fill="${fill}" ` +
+        `transform="rotate(${rotation.toFixed(2)} ${x.toFixed(2)} ${y.toFixed(2)})">${escapeXml(element.textContent)}</text>`;
+    }
+
+    function getManualRotation(element) {
+      return Number(element && element.dataset.manualRotation || 0);
+    }
+
+    function getManualScale(element) {
+      return Number(element && element.dataset.manualScale || 1);
+    }
+
+    function buildPosterSvg() {
+      const bg = bgColorInput.value;
+      const fg = inkColorInput.value;
+      const headlineFont = svgFontFamily(headlineFontSelect.value);
+      const brandFont = svgFontFamily(brandFontSelect.value);
+      const accentFont = svgFontFamily(accentFontSelect.value);
+
+      const parts = [];
+      parts.push(`<?xml version="1.0" encoding="UTF-8"?>`);
+      parts.push(`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="540" height="810" viewBox="0 0 540 810">`);
+      const usedCustomFonts = [headlineFontSelect.value, brandFontSelect.value, accentFontSelect.value]
+        .filter((value, index, arr) => customFonts.has(value) && arr.indexOf(value) === index);
+      if (usedCustomFonts.length) {
+        const fontFaceCss = usedCustomFonts.map((fontName) => {
+          const fontData = customFonts.get(fontName);
+          return `@font-face { font-family: '${fontName}'; src: url('${fontData.dataUrl}') format('${fontData.format}'); font-display: swap; }`;
+        }).join(' ');
+        parts.push(`<defs><style><![CDATA[${fontFaceCss}]]></style></defs>`);
+      }
+      parts.push(`<rect width="540" height="810" fill="${bg}"/>`);
+
+      if (posterImage.src && posterImage.style.display !== 'none') {
+        const ir = rectRelativeToPoster(posterImage);
+        const opacity = Number(getComputedStyle(posterImage).opacity || 1);
+        parts.push(`<image href="${escapeXml(posterImage.src)}" x="${ir.x.toFixed(2)}" y="${ir.y.toFixed(2)}" width="${ir.width.toFixed(2)}" height="${ir.height.toFixed(2)}" preserveAspectRatio="xMidYMid meet" opacity="${opacity.toFixed(3)}"/>`);
+      }
+
+      // Top letters: preserve the custom per-letter arc/rotation.
+      [...topHeader.children].forEach(child => {
+        if (!child.classList.contains('top-letter')) return;
+        parts.push(textElementSvg(child, {
+          fontFamily: accentFont,
+          manualScale: getManualScale(topHeader),
+          rotation: getRotationDeg(child) + getRotationDeg(topHeader) + getManualRotation(topHeader)
+        }));
+      });
+
+      parts.push(textElementSvg(brandHeader, {
+        fontFamily: brandFont,
+        manualScale: getManualScale(brandHeader),
+        rotation: getRotationDeg(brandHeader) + getManualRotation(brandHeader)
+      }));
+      [row1, row2, row3, row4].forEach(row => {
+        parts.push(textElementSvg(row, {
+          fontFamily: headlineFont,
+          manualScale: getManualScale(row),
+          rotation: getRotationDeg(row) + getManualRotation(row)
+        }));
+      });
+
+      // Side badges.
+      [...badgeLeft.querySelectorAll('span')].forEach(el => {
+        parts.push(textElementSvg(el, {
+          fontFamily: accentFont,
+          manualScale: getManualScale(badgeLeft),
+          rotation: getRotationDeg(badgeLeft) + getManualRotation(badgeLeft)
+        }));
+      });
+      [...badgeRight.querySelectorAll('span')].forEach(el => {
+        parts.push(textElementSvg(el, {
+          fontFamily: accentFont,
+          manualScale: getManualScale(badgeRight),
+          rotation: getRotationDeg(badgeRight) + getManualRotation(badgeRight)
+        }));
+      });
+
+      // Bottom credits: preserve per-letter curve and container tilt.
+      const leftTilt = getRotationDeg(creditLeft) + getManualRotation(creditLeft);
+      const rightTilt = getRotationDeg(creditRight) + getManualRotation(creditRight);
+      [...creditLeft.children].forEach(child => {
+        if (!child.classList.contains('bottom-letter')) return;
+        parts.push(textElementSvg(child, {
+          fontFamily: accentFont,
+          manualScale: getManualScale(creditLeft),
+          rotation: getRotationDeg(child) + leftTilt
+        }));
+      });
+      [...creditRight.children].forEach(child => {
+        if (!child.classList.contains('bottom-letter')) return;
+        parts.push(textElementSvg(child, {
+          fontFamily: accentFont,
+          manualScale: getManualScale(creditRight),
+          rotation: getRotationDeg(child) + rightTilt
+        }));
+      });
+
+      parts.push(`</svg>`);
+      return parts.join('\n');
+    }
+
+    function downloadTextFile(filename, content, mimeType) {
+      const blob = new Blob([content], {type: mimeType});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function randomItem(items) {
+      return items[Math.floor(Math.random() * items.length)];
+    }
+
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function setControlValue(control, value) {
+      control.value = value;
+    }
+
+    let lastRandomSignature = '';
+
+    function randomizePoster() {
+      // Ticketmaster concert snapshot — updated October 7, 2026.
+      // Each random poster uses real upcoming concert information:
+      // artist/event, tour, date, time, venue, and city.
+      const concertEvents = [
+        {
+          artist: 'STAIND',
+          lines: ['BREAK', 'THE CYCLE', '25TH', 'TOUR'],
+          date: 'OCT|07|2026',
+          time: '6:00|PM|LIVE',
+          venue: 'UTAH FIRST CREDIT UNION AMPHITHEATRE',
+          city: 'WEST VALLEY CITY, UT'
+        },
+        {
+          artist: 'BREAKING BENJAMIN',
+          lines: ['BREAKING', 'BENJAMIN', 'LIVE', '2026'],
+          date: 'OCT|07|2026',
+          time: '6:00|PM|LIVE',
+          venue: 'FIRST FINANCIAL CREDIT UNION AMPHITHEATER',
+          city: 'ALBUQUERQUE, NM'
+        },
+        {
+          artist: 'BRUNO MARS',
+          lines: ['THE', 'ROMANTIC', 'TOUR', 'LIVE'],
+          date: 'OCT|07|2026',
+          time: '7:00|PM|LIVE',
+          venue: 'SOFI STADIUM',
+          city: 'INGLEWOOD, CA'
+        },
+        {
+          artist: 'BRYSON TILLER',
+          lines: ['THE NEO', 'TRAPSOUL', 'TOUR', 'LIVE'],
+          date: 'OCT|07|2026',
+          time: '7:30|PM|LIVE',
+          venue: 'KFC YUM! CENTER',
+          city: 'LOUISVILLE, KY'
+        },
+        {
+          artist: 'RUSH',
+          lines: ['FIFTY', 'SOMETHING', 'RUSH', 'LIVE'],
+          date: 'OCT|07|2026',
+          time: '7:30|PM|LIVE',
+          venue: 'BALL ARENA',
+          city: 'DENVER, CO'
+        },
+        {
+          artist: 'TLC + SALT-N-PEPA',
+          lines: ["IT'S", 'ICONIC', 'EN VOGUE', 'LIVE'],
+          date: 'OCT|07|2026',
+          time: '7:30|PM|LIVE',
+          venue: 'TALKING STICK RESORT AMPHITHEATRE',
+          city: 'PHOENIX, AZ'
+        },
+        {
+          artist: '$UICIDEBOY$',
+          lines: ['GREY', 'DAY', 'TOUR', '2026'],
+          date: 'OCT|08|2026',
+          time: '6:30|PM|LIVE',
+          venue: 'TALKING STICK RESORT AMPHITHEATRE',
+          city: 'PHOENIX, AZ'
+        },
+        {
+          artist: 'JONAS BROTHERS',
+          lines: ['BURNING', 'UP', 'TOUR', 'AGAIN'],
+          date: 'OCT|08|2026',
+          time: '7:30|PM|LIVE',
+          venue: 'STATE FARM ARENA',
+          city: 'ATLANTA, GA'
+        },
+        {
+          artist: 'EMPIRE OF THE SUN',
+          lines: ['ASK THAT', 'GOD', 'AFTERLIFE', 'TOUR'],
+          date: 'OCT|08|2026',
+          time: '7:30|PM|LIVE',
+          venue: 'HOLLYWOOD BOWL',
+          city: 'HOLLYWOOD, CA'
+        },
+        {
+          artist: 'ROD WAVE',
+          lines: ["DON'T", 'LOOK', 'DOWN', 'TOUR'],
+          date: 'OCT|08|2026',
+          time: '8:00|PM|LIVE',
+          venue: 'GOLDEN 1 CENTER',
+          city: 'SACRAMENTO, CA'
+        },
+        {
+          artist: 'FUERZA REGIDA',
+          lines: ['THIS IS', 'OUR', 'DREAM', 'TOUR'],
+          date: 'OCT|08|2026',
+          time: '8:00|PM|LIVE',
+          venue: 'TRULIANT AMPHITHEATER',
+          city: 'CHARLOTTE, NC'
+        },
+        {
+          artist: 'KAROL G',
+          lines: ['VIAJANDO', 'POR EL', 'MUNDO', 'TROPITOUR'],
+          date: 'OCT|09|2026',
+          time: '7:00|PM|LIVE',
+          venue: 'RAYMOND JAMES STADIUM',
+          city: 'TAMPA, FL'
+        },
+        {
+          artist: 'PHISH',
+          lines: ['PHISH', 'LIVE', 'OCT 09', '2026'],
+          date: 'OCT|09|2026',
+          time: '7:00|PM|LIVE',
+          venue: 'VYSTAR VETERANS MEMORIAL ARENA',
+          city: 'JACKSONVILLE, FL'
+        },
+        {
+          artist: 'BILLY STRINGS',
+          lines: ['BILLY', 'STRINGS', 'LIVE', '2026'],
+          date: 'OCT|09|2026',
+          time: '7:30|PM|LIVE',
+          venue: 'ANGEL OF THE WINDS ARENA',
+          city: 'EVERETT, WA'
+        },
+        {
+          artist: 'ZACH BRYAN',
+          lines: ['ZACH', 'BRYAN', 'LIVE', '2026'],
+          date: 'OCT|10|2026',
+          time: '7:00|PM|LIVE',
+          venue: 'JORDAN-HARE STADIUM',
+          city: 'AUBURN, AL'
+        },
+        {
+          artist: 'LUKE BRYAN',
+          lines: ['WORD ON', 'THE', 'STREET', 'TOUR'],
+          date: 'OCT|10|2026',
+          time: '7:00|PM|LIVE',
+          venue: 'WHITE RIVER AMPHITHEATRE',
+          city: 'AUBURN, WA'
+        },
+        {
+          artist: 'ED SHEERAN',
+          lines: ['LOOP', 'TOUR', 'ED', 'SHEERAN'],
+          date: 'OCT|10|2026',
+          time: '8:00|PM|LIVE',
+          venue: 'LUCAS OIL STADIUM',
+          city: 'INDIANAPOLIS, IN'
+        },
+        {
+          artist: 'STEVE LACY',
+          lines: ['OH', 'YEAH?', 'TOUR', 'LIVE'],
+          date: 'OCT|10|2026',
+          time: '8:00|PM|LIVE',
+          venue: 'RADIO CITY MUSIC HALL',
+          city: 'NEW YORK, NY'
+        }
+      ];
+
+      const palettes = [
+        ['#d8a5b2', '#111111'], ['#f2d6d0', '#121212'], ['#f0c987', '#171717'], ['#c7d7f2', '#101010'],
+        ['#cbd8c0', '#111111'], ['#e0c7ee', '#121212'], ['#f1e8d5', '#111111'], ['#b9d8d2', '#101010'],
+        ['#efb9c7', '#111111'], ['#d6c7a1', '#111111'], ['#111111', '#f1c2cf'], ['#171717', '#f2dd8e'],
+        ['#241f31', '#ffb7d5'], ['#0c2440', '#f5d36f'], ['#e6ff4d', '#111111'], ['#ff6b57', '#151515'],
+        ['#d6f0ff', '#2b154d'], ['#fff4e8', '#e01f3d']
+      ];
+
+      const allFonts = ['Anton', 'League Spartan', 'Syne', 'Arial Black', 'Bebas Neue', 'Oswald', 'Barlow Condensed', 'Archivo Black', 'Space Grotesk', ...customFonts.keys()];
+
+      const topTextTemplates = [
+        (event) => `TICKETMASTER • ${event.city}`,
+        (event) => `UPCOMING CONCERT • ${event.city}`,
+        (event) => `LIVE IN • ${event.city}`,
+        (event) => `${event.artist} • TOUR DATE`,
+        (event) => `${event.venue} • LIVE`,
+        (event) => `MUSIC EVENT • ${event.city}`
+      ];
+
+      const creditTemplates = [
+        (event) => ({ left: event.venue, right: event.city }),
+        (event) => ({ left: event.artist, right: event.venue }),
+        (event) => ({ left: event.city, right: event.venue }),
+        (event) => ({ left: event.venue, right: 'TICKETMASTER' })
+      ];
+
+      const layouts = [
+        {
+          id: 'classic-stack',
+          moves: { topHeader:[0,0], brandHeader:[0,0], row1:[0,0], row2:[0,0], row3:[0,0], row4:[0,0], badgeLeft:[0,0], badgeRight:[0,0], creditLeft:[0,0], creditRight:[0,0] },
+          rotations: { topHeader:0, brandHeader:0, row1:0, row2:0, row3:0, row4:0, badgeLeft:-4, badgeRight:4, creditLeft:-4, creditRight:4 },
+          scales: { brandHeader:1, row1:1, row2:1, row3:1, row4:1 },
+          jitter: 8
+        },
+        {
+          id: 'staggered-left',
+          moves: { topHeader:[-20,4], brandHeader:[-25,-10], row1:[-80,-12], row2:[45,8], row3:[-35,18], row4:[75,34], badgeLeft:[38,34], badgeRight:[-25,28], creditLeft:[18,-6], creditRight:[-16,-8] },
+          rotations: { topHeader:-4, brandHeader:-2, row1:-5, row2:2, row3:-1, row4:4, badgeLeft:-8, badgeRight:7, creditLeft:-8, creditRight:6 },
+          scales: { brandHeader:0.98, row1:0.92, row2:1.06, row3:0.96, row4:1.10 },
+          jitter: 14
+        },
+        {
+          id: 'staggered-right',
+          moves: { topHeader:[20,4], brandHeader:[25,-10], row1:[80,-12], row2:[-45,8], row3:[35,18], row4:[-75,34], badgeLeft:[25,28], badgeRight:[-38,34], creditLeft:[16,-8], creditRight:[-18,-6] },
+          rotations: { topHeader:4, brandHeader:2, row1:5, row2:-2, row3:1, row4:-4, badgeLeft:-7, badgeRight:8, creditLeft:-6, creditRight:8 },
+          scales: { brandHeader:0.98, row1:0.92, row2:1.06, row3:0.96, row4:1.10 },
+          jitter: 14
+        },
+        {
+          id: 'diagonal-rise',
+          moves: { topHeader:[0,-2], brandHeader:[0,-18], row1:[-95,-26], row2:[-25,6], row3:[45,34], row4:[100,62], badgeLeft:[58,44], badgeRight:[-32,16], creditLeft:[8,-4], creditRight:[-12,-4] },
+          rotations: { topHeader:-3, brandHeader:0, row1:-7, row2:-3, row3:1, row4:6, badgeLeft:-9, badgeRight:5, creditLeft:-6, creditRight:6 },
+          scales: { brandHeader:1.02, row1:0.90, row2:1.00, row3:1.06, row4:1.14 },
+          jitter: 12
+        },
+        {
+          id: 'center-punch',
+          moves: { topHeader:[0,-6], brandHeader:[0,14], row1:[0,-10], row2:[0,18], row3:[0,50], row4:[0,84], badgeLeft:[10,-4], badgeRight:[-10,-4], creditLeft:[24,-10], creditRight:[-24,-10] },
+          rotations: { topHeader:0, brandHeader:0, row1:0, row2:0, row3:0, row4:0, badgeLeft:-3, badgeRight:3, creditLeft:-9, creditRight:9 },
+          scales: { brandHeader:1.05, row1:0.86, row2:1.02, row3:1.12, row4:1.24 },
+          jitter: 10
+        },
+        {
+          id: 'poster-grid',
+          moves: { topHeader:[0,10], brandHeader:[-50,-8], row1:[68,-2], row2:[-42,28], row3:[55,58], row4:[-24,88], badgeLeft:[46,70], badgeRight:[-46,70], creditLeft:[10,-14], creditRight:[-10,-14] },
+          rotations: { topHeader:2, brandHeader:0, row1:4, row2:-4, row3:3, row4:-2, badgeLeft:-10, badgeRight:10, creditLeft:-7, creditRight:7 },
+          scales: { brandHeader:0.94, row1:0.96, row2:1.04, row3:1.08, row4:1.12 },
+          jitter: 16
+        },
+        {
+          id: 'minimal-billboard',
+          moves: { topHeader:[0,18], brandHeader:[0,-26], row1:[0,10], row2:[0,44], row3:[0,92], row4:[0,142], badgeLeft:[0,88], badgeRight:[0,88], creditLeft:[0,-18], creditRight:[0,-18] },
+          rotations: { topHeader:0, brandHeader:0, row1:0, row2:0, row3:0, row4:0, badgeLeft:-2, badgeRight:2, creditLeft:-5, creditRight:5 },
+          scales: { brandHeader:0.92, row1:0.82, row2:1.08, row3:1.18, row4:1.28 },
+          jitter: 8
+        }
+      ];
+
+      const styles = [
+        { id:'dense-italic', headlineSpacing:'-0.04em', accentStyle:'italic', brandSpacing:'0.04em', brandScale:1.24 },
+        { id:'clean-sans', headlineSpacing:'-0.01em', accentStyle:'normal', brandSpacing:'0.10em', brandScale:1.10 },
+        { id:'airy-italic', headlineSpacing:'0.015em', accentStyle:'italic', brandSpacing:'0.02em', brandScale:1.30 },
+        { id:'tight-wide', headlineSpacing:'-0.06em', accentStyle:'normal', brandSpacing:'0.14em', brandScale:1.16 },
+        { id:'neutral', headlineSpacing:'0em', accentStyle:'italic', brandSpacing:'0.07em', brandScale:1.20 }
+      ];
+
+      const headlineTemplates = [
+        (event) => event.lines,
+        (event) => [event.artist.split(' ')[0] || event.artist, event.lines[0], event.lines[2], 'LIVE'],
+        (event) => [event.lines[1], event.lines[2], event.lines[3], 'LIVE'],
+        (event) => [event.lines[0], event.artist.split(' ').slice(0,2).join(' '), event.lines[2], event.lines[3]],
+        (event) => [event.lines[0], event.lines[1], 'LIVE', event.lines[3]]
+      ];
+
+      const elements = { topHeader, brandHeader, row1, row2, row3, row4, badgeLeft, badgeRight, creditLeft, creditRight };
+
+      let event, palette, style, layout, topTemplate, creditTemplate, headlineTemplate;
+      let headlineFont, brandFont, accentFont, signature = '';
+      for (let attempt = 0; attempt < 30; attempt++) {
+        event = randomItem(concertEvents);
+        palette = randomItem(palettes);
+        style = randomItem(styles);
+        layout = randomItem(layouts);
+        topTemplate = randomItem(topTextTemplates);
+        creditTemplate = randomItem(creditTemplates);
+        headlineTemplate = randomItem(headlineTemplates);
+        headlineFont = randomItem(allFonts);
+        brandFont = randomItem(allFonts);
+        accentFont = randomItem(allFonts);
+        signature = [event.artist, palette.join(','), style.id, layout.id, topTemplate(event), creditTemplate(event).left, headlineFont, brandFont, accentFont].join('||');
+        if (signature !== lastRandomSignature) break;
+      }
+      lastRandomSignature = signature;
+
+      const creditValues = creditTemplate(event);
+      const headlineValues = headlineTemplate(event);
+
+      topTextInput.value = topTemplate(event);
+      brandTextInput.value = event.artist;
+      line1Input.value = headlineValues[0] || event.lines[0];
+      line2Input.value = headlineValues[1] || event.lines[1];
+      line3Input.value = headlineValues[2] || event.lines[2];
+      line4Input.value = headlineValues[3] || event.lines[3];
+      leftBadgeInput.value = event.date;
+      rightBadgeInput.value = event.time;
+      leftCreditInput.value = creditValues.left;
+      rightCreditInput.value = creditValues.right;
+
+      bgColorInput.value = palette[0];
+      inkColorInput.value = palette[1];
+      headlineFontSelect.value = headlineFont;
+      brandFontSelect.value = brandFont;
+      accentFontSelect.value = accentFont;
+
+      setControlValue(topSizeInput, randomInt(15, 26));
+      setControlValue(brandSizeInput, randomInt(44, 78));
+      setControlValue(headlineSizeInput, randomInt(112, 172));
+      setControlValue(headlineGapInput, randomInt(0, 30));
+      setControlValue(badgeSizeInput, randomInt(10, 20));
+      setControlValue(bottomSizeInput, randomInt(12, 24));
+      setControlValue(badgeTiltInput, randomInt(0, 14));
+      setControlValue(topTiltInput, randomInt(-12, 12));
+      setControlValue(topArcInput, randomInt(0, 22));
+      setControlValue(bottomTiltInput, randomInt(0, 14));
+      setControlValue(bottomArcInput, randomInt(0, 18));
+
+      if (posterImage.src && posterImage.style.display !== 'none') {
+        setControlValue(imageSizeInput, randomInt(120, 390));
+        setControlValue(imageOpacityInput, randomInt(25, 100));
+        setControlValue(imageYInput, randomInt(180, 640));
+      }
+
+      // Clear previous manual transforms so each random poster starts fresh.
+      draggableTextElements.forEach((element) => {
+        applyDragOffset(element, 0, 0);
+        applyManualRotation(element, 0);
+        applyManualScale(element, 1);
+      });
+
+      updateAll();
+
+      [row1, row2, row3, row4].forEach(row => {
+        row.style.letterSpacing = style.headlineSpacing;
+      });
+      topHeader.style.fontStyle = style.accentStyle;
+      badgeLeft.style.fontStyle = style.accentStyle;
+      badgeRight.style.fontStyle = style.accentStyle;
+      creditLeft.style.fontStyle = style.accentStyle;
+      creditRight.style.fontStyle = style.accentStyle;
+      brandHeader.style.letterSpacing = style.brandSpacing;
+      brandHeader.style.transform = `scaleX(${style.brandScale})`;
+
+      // Apply broader random layout changes so posters do not always follow the original Optimo arrangement.
+      Object.entries(layout.moves).forEach(([key, value]) => {
+        const element = elements[key];
+        if (!element) return;
+        const x = value[0] + randomInt(-layout.jitter, layout.jitter);
+        const y = value[1] + randomInt(-layout.jitter, layout.jitter);
+        applyDragOffset(element, x, y);
+      });
+
+      Object.entries(layout.rotations).forEach(([key, value]) => {
+        const element = elements[key];
+        if (!element) return;
+        applyManualRotation(element, value + randomInt(-3, 3));
+      });
+
+      Object.entries(layout.scales).forEach(([key, value]) => {
+        const element = elements[key];
+        if (!element) return;
+        const jitterScale = (randomInt(-6, 6) / 100);
+        applyManualScale(element, value + jitterScale);
+      });
+
+      // Small extra layout variety for badges and credits.
+      if (randomInt(0, 1) === 1) {
+        const leftOffset = getDragOffset(badgeLeft);
+        const rightOffset = getDragOffset(badgeRight);
+        applyDragOffset(badgeLeft, leftOffset.x, leftOffset.y + randomInt(10, 26));
+        applyDragOffset(badgeRight, rightOffset.x, rightOffset.y + randomInt(10, 26));
+      }
+
+      if (randomInt(0, 1) === 1) {
+        const leftOffset = getDragOffset(creditLeft);
+        const rightOffset = getDragOffset(creditRight);
+        applyDragOffset(creditLeft, leftOffset.x + randomInt(-16, 16), leftOffset.y + randomInt(-8, 8));
+        applyDragOffset(creditRight, rightOffset.x + randomInt(-16, 16), rightOffset.y + randomInt(-8, 8));
+      }
+
+      updateTransformBox();
+    }
+
+    const draggableTextElements = [
+      topHeader, brandHeader, row1, row2, row3, row4,
+      badgeLeft, badgeRight, creditLeft, creditRight
+    ];
+
+    let selectedTextElement = null;
+
+    function getDragOffset(element) {
+      return {
+        x: Number(element.dataset.dragX || 0),
+        y: Number(element.dataset.dragY || 0)
+      };
+    }
+
+    function applyDragOffset(element, x, y) {
+      element.dataset.dragX = x;
+      element.dataset.dragY = y;
+      element.style.translate = `${x}px ${y}px`;
+      if (element === selectedTextElement) updateTransformBox();
+    }
+
+    function applyManualRotation(element, degrees) {
+      const value = Math.round(degrees * 10) / 10;
+      element.dataset.manualRotation = value;
+      element.style.rotate = `${value}deg`;
+      if (element === selectedTextElement) updateTransformBox();
+    }
+
+    function applyManualScale(element, scale) {
+      const value = Math.max(0.35, Math.min(3, scale));
+      element.dataset.manualScale = value;
+      element.style.scale = String(value);
+      if (element === selectedTextElement) updateTransformBox();
+    }
+
+    function updateTransformBox() {
+      if (!selectedTextElement) {
+        textTransformBox.classList.remove('active');
+        return;
+      }
+
+      const posterRect = poster.getBoundingClientRect();
+      const elementRect = selectedTextElement.getBoundingClientRect();
+      const scaleX = poster.clientWidth / posterRect.width;
+      const scaleY = poster.clientHeight / posterRect.height;
+
+      textTransformBox.style.left = `${(elementRect.left - posterRect.left) * scaleX}px`;
+      textTransformBox.style.top = `${(elementRect.top - posterRect.top) * scaleY}px`;
+      textTransformBox.style.width = `${elementRect.width * scaleX}px`;
+      textTransformBox.style.height = `${elementRect.height * scaleY}px`;
+      textTransformBox.classList.add('active');
+    }
+
+    function selectTextElement(element) {
+      selectedTextElement = element;
+      updateTransformBox();
+    }
+
+    function deselectTextElement() {
+      selectedTextElement = null;
+      textTransformBox.classList.remove('active');
+    }
+
+    function makeTextDraggable(element) {
+      element.addEventListener('pointerdown', (event) => {
+        if (event.button !== undefined && event.button !== 0) return;
+        event.preventDefault();
+        event.stopPropagation();
+        selectTextElement(element);
+
+        const start = getDragOffset(element);
+        const startX = event.clientX;
+        const startY = event.clientY;
+        element.classList.add('dragging');
+        poster.classList.add('drag-active');
+        element.setPointerCapture(event.pointerId);
+
+        const onMove = (moveEvent) => {
+          const dx = moveEvent.clientX - startX;
+          const dy = moveEvent.clientY - startY;
+          applyDragOffset(element, start.x + dx, start.y + dy);
+        };
+
+        const finishDrag = () => {
+          element.classList.remove('dragging');
+          poster.classList.remove('drag-active');
+          element.removeEventListener('pointermove', onMove);
+          element.removeEventListener('pointerup', finishDrag);
+          element.removeEventListener('pointercancel', finishDrag);
+          updateTransformBox();
+        };
+
+        element.addEventListener('pointermove', onMove);
+        element.addEventListener('pointerup', finishDrag);
+        element.addEventListener('pointercancel', finishDrag);
+      });
+    }
+
+    draggableTextElements.forEach(makeTextDraggable);
+
+    rotateTextHandle.addEventListener('pointerdown', (event) => {
+      if (!selectedTextElement) return;
+      event.preventDefault();
+      event.stopPropagation();
+      rotateTextHandle.setPointerCapture(event.pointerId);
+
+      const elementRect = selectedTextElement.getBoundingClientRect();
+      const centerX = elementRect.left + elementRect.width / 2;
+      const centerY = elementRect.top + elementRect.height / 2;
+      const startAngle = Math.atan2(event.clientY - centerY, event.clientX - centerX) * 180 / Math.PI;
+      const startRotation = getManualRotation(selectedTextElement);
+
+      const onRotate = (moveEvent) => {
+        const angle = Math.atan2(moveEvent.clientY - centerY, moveEvent.clientX - centerX) * 180 / Math.PI;
+        applyManualRotation(selectedTextElement, startRotation + angle - startAngle);
+      };
+
+      const finishRotate = () => {
+        rotateTextHandle.removeEventListener('pointermove', onRotate);
+        rotateTextHandle.removeEventListener('pointerup', finishRotate);
+        rotateTextHandle.removeEventListener('pointercancel', finishRotate);
+        updateTransformBox();
+      };
+
+      rotateTextHandle.addEventListener('pointermove', onRotate);
+      rotateTextHandle.addEventListener('pointerup', finishRotate);
+      rotateTextHandle.addEventListener('pointercancel', finishRotate);
+    });
+
+    resizeTextHandle.addEventListener('pointerdown', (event) => {
+      if (!selectedTextElement) return;
+      event.preventDefault();
+      event.stopPropagation();
+      resizeTextHandle.setPointerCapture(event.pointerId);
+
+      const elementRect = selectedTextElement.getBoundingClientRect();
+      const centerX = elementRect.left + elementRect.width / 2;
+      const centerY = elementRect.top + elementRect.height / 2;
+      const startDistance = Math.max(12, Math.hypot(event.clientX - centerX, event.clientY - centerY));
+      const startScale = getManualScale(selectedTextElement);
+
+      const onResize = (moveEvent) => {
+        const distance = Math.max(12, Math.hypot(moveEvent.clientX - centerX, moveEvent.clientY - centerY));
+        applyManualScale(selectedTextElement, startScale * (distance / startDistance));
+      };
+
+      const finishResize = () => {
+        resizeTextHandle.removeEventListener('pointermove', onResize);
+        resizeTextHandle.removeEventListener('pointerup', finishResize);
+        resizeTextHandle.removeEventListener('pointercancel', finishResize);
+        updateTransformBox();
+      };
+
+      resizeTextHandle.addEventListener('pointermove', onResize);
+      resizeTextHandle.addEventListener('pointerup', finishResize);
+      resizeTextHandle.addEventListener('pointercancel', finishResize);
+    });
+
+    poster.addEventListener('pointerdown', (event) => {
+      if (event.target === poster || event.target === posterImage) {
+        deselectTextElement();
+      }
+    });
+
+    window.addEventListener('resize', updateTransformBox);
+
+    resetTextPositionsBtn.addEventListener('click', () => {
+      draggableTextElements.forEach(element => {
+        applyDragOffset(element, 0, 0);
+      });
+      updateTransformBox();
+    });
+
+    randomizeBtn.addEventListener('click', randomizePoster);
+
+    downloadSvgBtn.addEventListener('click', () => {
+      const svg = buildPosterSvg();
+      downloadTextFile('poster.svg', svg, 'image/svg+xml;charset=utf-8');
+    });
+
+    function dataUrlToBytes(dataUrl) {
+      const base64 = dataUrl.split(',')[1];
+      const binary = atob(base64);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      return bytes;
+    }
+
+    function asciiBytes(text) {
+      return new TextEncoder().encode(text);
+    }
+
+    function concatBytes(chunks) {
+      const total = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+      const output = new Uint8Array(total);
+      let offset = 0;
+      chunks.forEach(chunk => {
+        output.set(chunk, offset);
+        offset += chunk.length;
+      });
+      return output;
+    }
+
+    function makePdfFromJpeg(jpegBytes, imageWidth, imageHeight) {
+      const pageWidth = 540;
+      const pageHeight = 810;
+      const objects = [];
+
+      objects[1] = asciiBytes('1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
+      objects[2] = asciiBytes('2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n');
+      objects[3] = asciiBytes(`3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>\nendobj\n`);
+      objects[4] = concatBytes([
+        asciiBytes(`4 0 obj\n<< /Type /XObject /Subtype /Image /Width ${imageWidth} /Height ${imageHeight} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpegBytes.length} >>\nstream\n`),
+        jpegBytes,
+        asciiBytes('\nendstream\nendobj\n')
+      ]);
+
+      const pageContent = `q\n${pageWidth} 0 0 ${pageHeight} 0 0 cm\n/Im0 Do\nQ\n`;
+      const pageContentBytes = asciiBytes(pageContent);
+      objects[5] = concatBytes([
+        asciiBytes(`5 0 obj\n<< /Length ${pageContentBytes.length} >>\nstream\n`),
+        pageContentBytes,
+        asciiBytes('endstream\nendobj\n')
+      ]);
+
+      const header = asciiBytes('%PDF-1.4\n%PDFGEN\n');
+      const chunks = [header];
+      const offsets = [0];
+      let currentOffset = header.length;
+
+      for (let i = 1; i <= 5; i++) {
+        offsets[i] = currentOffset;
+        chunks.push(objects[i]);
+        currentOffset += objects[i].length;
+      }
+
+      const xrefOffset = currentOffset;
+      let xref = 'xref\n0 6\n0000000000 65535 f \n';
+      for (let i = 1; i <= 5; i++) xref += String(offsets[i]).padStart(10, '0') + ' 00000 n \n';
+      const trailer = `${xref}trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+      chunks.push(asciiBytes(trailer));
+      return concatBytes(chunks);
+    }
+
+    function getTransformParts(element) {
+      const transform = getComputedStyle(element).transform;
+      if (!transform || transform === 'none') {
+        return { rotation: 0, scaleX: 1, scaleY: 1 };
+      }
+
+      try {
+        const matrix = new DOMMatrixReadOnly(transform);
+        return {
+          rotation: Math.atan2(matrix.b, matrix.a) * 180 / Math.PI,
+          scaleX: Math.hypot(matrix.a, matrix.b) || 1,
+          scaleY: Math.hypot(matrix.c, matrix.d) || 1
+        };
+      } catch (error) {
+        return { rotation: getRotationDeg(element), scaleX: 1, scaleY: 1 };
+      }
+    }
+
+    function measureSpacedText(ctx, text, spacing) {
+      const chars = [...String(text || '')];
+      if (!chars.length) return 0;
+      let width = 0;
+      chars.forEach((char, index) => {
+        width += ctx.measureText(char).width;
+        if (index < chars.length - 1) width += spacing;
+      });
+      return width;
+    }
+
+    function fillSpacedText(ctx, text, spacing) {
+      const chars = [...String(text || '')];
+      if (!chars.length) return;
+      if (!Number.isFinite(spacing) || Math.abs(spacing) < 0.01 || chars.length === 1) {
+        ctx.textAlign = 'center';
+        ctx.fillText(chars.join(''), 0, 0);
+        return;
+      }
+
+      const totalWidth = measureSpacedText(ctx, chars.join(''), spacing);
+      let x = -totalWidth / 2;
+      ctx.textAlign = 'left';
+      chars.forEach((char, index) => {
+        ctx.fillText(char, x, 0);
+        x += ctx.measureText(char).width;
+        if (index < chars.length - 1) x += spacing;
+      });
+    }
+
+    function drawDomText(ctx, element, options = {}) {
+      if (!element || !element.textContent.trim()) return;
+      const rect = rectRelativeToPoster(element);
+      const style = getComputedStyle(element);
+      const posterRect = poster.getBoundingClientRect();
+      const logicalScale = 540 / posterRect.width;
+      const inheritedManualScale = Number(options.manualScale || 1);
+      const transform = getTransformParts(element);
+      const fontSize = parseFloat(style.fontSize) * logicalScale * inheritedManualScale;
+      const rawSpacing = parseFloat(style.letterSpacing);
+      const spacing = (Number.isFinite(rawSpacing) ? rawSpacing : 0) * logicalScale * inheritedManualScale;
+      const rotation = Number(options.rotation ?? transform.rotation);
+      const scaleX = Number(options.scaleX ?? transform.scaleX);
+      const scaleY = Number(options.scaleY ?? transform.scaleY);
+      const fontStyle = style.fontStyle === 'italic' || style.fontStyle === 'oblique' ? style.fontStyle : 'normal';
+      const fontWeight = style.fontWeight || '400';
+
+      ctx.save();
+      ctx.translate(rect.cx, rect.cy);
+      ctx.rotate(rotation * Math.PI / 180);
+      ctx.scale(scaleX, scaleY);
+      ctx.fillStyle = inkColorInput.value;
+      ctx.textBaseline = 'middle';
+      ctx.font = `${fontStyle} ${fontWeight} ${fontSize}px ${style.fontFamily}`;
+      fillSpacedText(ctx, element.textContent, spacing);
+      ctx.restore();
+    }
+
+    async function ensurePosterFontsReady() {
+      if (!document.fonts) return;
+      const textNodes = [
+        topHeader, brandHeader, row1, row2, row3, row4,
+        badgeLeft, badgeRight, creditLeft, creditRight,
+        ...topHeader.querySelectorAll('.top-letter'),
+        ...badgeLeft.querySelectorAll('span'),
+        ...badgeRight.querySelectorAll('span'),
+        ...creditLeft.querySelectorAll('.bottom-letter'),
+        ...creditRight.querySelectorAll('.bottom-letter')
+      ];
+
+      const loads = textNodes.map((element) => {
+        const style = getComputedStyle(element);
+        const sample = (element.textContent || 'ABC').trim() || 'ABC';
+        const fontSpec = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+        return document.fonts.load(fontSpec, sample).catch(() => []);
+      });
+      await Promise.all(loads);
+      await document.fonts.ready;
+    }
+
+    async function renderPosterToJpeg() {
+      await ensurePosterFontsReady();
+
+      const exportScale = 3;
+      const canvas = document.createElement('canvas');
+      canvas.width = 540 * exportScale;
+      canvas.height = 810 * exportScale;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Canvas is unavailable in this browser.');
+
+      // Work in the poster's native 540 × 810 coordinate system, then scale up
+      // for a sharper PDF. This guarantees the full poster is always captured.
+      ctx.scale(exportScale, exportScale);
+      ctx.fillStyle = bgColorInput.value;
+      ctx.fillRect(0, 0, 540, 810);
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, 0, 540, 810);
+      ctx.clip();
+
+      // Draw the inserted image using its actual on-screen location and opacity.
+      if (posterImage.src && getComputedStyle(posterImage).display !== 'none') {
+        if (!posterImage.complete) {
+          await new Promise((resolve) => {
+            posterImage.addEventListener('load', resolve, { once: true });
+            posterImage.addEventListener('error', resolve, { once: true });
+          });
+        }
+        const imageRect = rectRelativeToPoster(posterImage);
+        ctx.save();
+        ctx.globalAlpha = Number(getComputedStyle(posterImage).opacity || 1);
+        if (posterImage.complete && posterImage.naturalWidth) {
+          ctx.drawImage(posterImage, imageRect.x, imageRect.y, imageRect.width, imageRect.height);
+        }
+        ctx.restore();
+      }
+
+      // Top curved text — every letter keeps its live position, arc, tilt,
+      // drag offset, manual rotation, and resize amount.
+      const topTransform = getTransformParts(topHeader);
+      const topManualScale = getManualScale(topHeader);
+      [...topHeader.querySelectorAll('.top-letter')].forEach((letter) => {
+        const letterTransform = getTransformParts(letter);
+        drawDomText(ctx, letter, {
+          manualScale: topManualScale,
+          rotation: letterTransform.rotation + topTransform.rotation + getManualRotation(topHeader)
+        });
+      });
+
+      const brandTransform = getTransformParts(brandHeader);
+      drawDomText(ctx, brandHeader, {
+        manualScale: getManualScale(brandHeader),
+        rotation: brandTransform.rotation + getManualRotation(brandHeader),
+        scaleX: brandTransform.scaleX,
+        scaleY: brandTransform.scaleY
+      });
+
+      [row1, row2, row3, row4].forEach((row) => {
+        const rowTransform = getTransformParts(row);
+        drawDomText(ctx, row, {
+          manualScale: getManualScale(row),
+          rotation: rowTransform.rotation + getManualRotation(row),
+          scaleX: rowTransform.scaleX,
+          scaleY: rowTransform.scaleY
+        });
+      });
+
+      const leftBadgeTransform = getTransformParts(badgeLeft);
+      [...badgeLeft.querySelectorAll('span')].forEach((span) => {
+        drawDomText(ctx, span, {
+          manualScale: getManualScale(badgeLeft),
+          rotation: leftBadgeTransform.rotation + getManualRotation(badgeLeft)
+        });
+      });
+
+      const rightBadgeTransform = getTransformParts(badgeRight);
+      [...badgeRight.querySelectorAll('span')].forEach((span) => {
+        drawDomText(ctx, span, {
+          manualScale: getManualScale(badgeRight),
+          rotation: rightBadgeTransform.rotation + getManualRotation(badgeRight)
+        });
+      });
+
+      const leftCreditTransform = getTransformParts(creditLeft);
+      [...creditLeft.querySelectorAll('.bottom-letter')].forEach((letter) => {
+        const letterTransform = getTransformParts(letter);
+        drawDomText(ctx, letter, {
+          manualScale: getManualScale(creditLeft),
+          rotation: letterTransform.rotation + leftCreditTransform.rotation + getManualRotation(creditLeft)
+        });
+      });
+
+      const rightCreditTransform = getTransformParts(creditRight);
+      [...creditRight.querySelectorAll('.bottom-letter')].forEach((letter) => {
+        const letterTransform = getTransformParts(letter);
+        drawDomText(ctx, letter, {
+          manualScale: getManualScale(creditRight),
+          rotation: letterTransform.rotation + rightCreditTransform.rotation + getManualRotation(creditRight)
+        });
+      });
+
+      ctx.restore();
+
+      const jpegDataUrl = canvas.toDataURL('image/jpeg', 0.98);
+      return {
+        bytes: dataUrlToBytes(jpegDataUrl),
+        width: canvas.width,
+        height: canvas.height
+      };
+    }
+
+    savePdfBtn.addEventListener('click', async () => {
+      const originalText = savePdfBtn.textContent;
+      savePdfBtn.disabled = true;
+      savePdfBtn.textContent = 'Opening PDF...';
+
+      try {
+        if (document.fonts && document.fonts.ready) {
+          await document.fonts.ready;
+        }
+
+        // Remove the selection outline/handles from the printed poster.
+        if (typeof clearSelectedTextElement === 'function') {
+          clearSelectedTextElement();
+        } else if (textTransformBox) {
+          textTransformBox.classList.remove('active');
+        }
+
+        // Give the browser one frame to finish the exact live layout before printing.
+        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        window.print();
+      } finally {
+        savePdfBtn.disabled = false;
+        savePdfBtn.textContent = originalText;
+      }
+    });
+
+    function updateAll() {
+      applyText();
+      applyFonts();
+      applyColors();
+      applySizes();
+      applyImage();
+      requestAnimationFrame(() => {
+        if (typeof updateTransformBox === 'function') updateTransformBox();
+      });
+    }
+
+    imageUploadInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        posterImage.src = event.target.result;
+        posterImage.style.display = 'block';
+        applyImage();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    addCustomFontBtn.addEventListener('click', addCustomFontFromInput);
+    customFontFileInput.addEventListener('change', () => {
+      if (customFontFileInput.files && customFontFileInput.files[0] && !customFontNameInput.value.trim()) {
+        customFontNameInput.value = customFontFileInput.files[0].name.replace(/\.[^.]+$/, '');
+      }
+    });
+
+    [
+      topTextInput, brandTextInput, line1Input, line2Input, line3Input, line4Input,
+      leftBadgeInput, rightBadgeInput, leftCreditInput, rightCreditInput,
+      headlineFontSelect, brandFontSelect, accentFontSelect,
+      bgColorInput, inkColorInput,
+      imageSizeInput, imageOpacityInput, imageYInput,
+      topSizeInput, brandSizeInput, headlineSizeInput, headlineGapInput,
+      badgeSizeInput, bottomSizeInput, badgeTiltInput, topTiltInput, topArcInput, bottomTiltInput, bottomArcInput
+    ].forEach(input => input.addEventListener('input', updateAll));
+
+    updateAll();
+  </script>
+</body>
+</html>
