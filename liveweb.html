@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>LIVE EVENT POSTER WALL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=League+Spartan:wght@500;700;900&family=Oswald:wght@500;700&family=Space+Grotesk:wght@500;700&family=Syne:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{--page:#090909;--pageInk:#f3f3f3;--muted:#8b8b8b;--line:#292929}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--page);color:var(--pageInk);font-family:"Space Grotesk",Arial,sans-serif;min-height:100vh}
+button,select{font:inherit}
+.shell{max-width:1500px;margin:auto;padding:28px clamp(18px,3vw,46px) 80px}
+.mast{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:end;padding-bottom:24px;border-bottom:1px solid var(--line)}
+.eyebrow{font-size:.68rem;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+h1{font-family:"League Spartan",sans-serif;font-size:clamp(3rem,8vw,8.5rem);line-height:.76;letter-spacing:-.065em;max-width:1050px}
+.intro{margin-top:24px;max-width:720px;color:#aaa;line-height:1.55;font-size:.92rem}
+.controls{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;max-width:510px}
+.control{border:1px solid #444;background:#131313;color:#fff;padding:11px 13px;cursor:pointer;min-height:42px}
+.control:hover{background:#202020}.control.primary{background:#f1f1f1;color:#0b0b0b;border-color:#f1f1f1;font-weight:800}
+.statusbar{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;padding:17px 0 22px;color:#888;font-size:.75rem;border-bottom:1px solid var(--line)}
+.legend{display:flex;flex-wrap:wrap;gap:16px}.legend b{color:#ddd;font-weight:600}
+.wall{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:12px}
+.poster{--bg:#ddd;--ink:#111;--accent:#ff4f78;--tilt:0deg;position:relative;aspect-ratio:2/3;background:var(--bg);color:var(--ink);overflow:hidden;isolation:isolate;text-decoration:none;display:block;border:1px solid rgba(255,255,255,.08);transform:rotate(var(--tilt));transition:transform .18s ease,filter .18s ease}
+.poster:hover{transform:translateY(-4px) rotate(var(--tilt));filter:brightness(1.03)}
+.poster-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.19;filter:grayscale(1) contrast(1.25);mix-blend-mode:multiply;z-index:0}
+.poster:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(0,0,0,.08));z-index:0;pointer-events:none}
+.poster-inner{position:absolute;inset:0;padding:7.5% 7%;z-index:3;display:flex;flex-direction:column}
+.topline{font:800 clamp(.58rem,.85vw,.82rem)/1 "League Spartan",sans-serif;letter-spacing:.2em;text-transform:uppercase;display:flex;justify-content:space-between;gap:8px;border-bottom:2px solid currentColor;padding-bottom:7px}
+.title{font-family:var(--title-font,"Anton"),sans-serif;font-size:var(--title-size,3.5rem);line-height:.82;letter-spacing:-.045em;text-transform:uppercase;overflow-wrap:anywhere;margin-top:auto;margin-bottom:auto;max-width:100%;transform:translate(var(--tx,0),var(--ty,0)) rotate(var(--rot,0deg));transform-origin:left center}
+.meta{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;border-top:2px solid currentColor;padding-top:8px;text-transform:uppercase}
+.venue{font:800 clamp(.63rem,1vw,.9rem)/1.05 "League Spartan",sans-serif;max-width:85%}.date{font:900 clamp(1.65rem,3vw,3.1rem)/.78 "Bebas Neue",sans-serif;text-align:right}.city{font-size:.62rem;letter-spacing:.15em;margin-top:5px}.tickets{position:absolute;right:6%;top:48%;z-index:5;font:900 .59rem/1 "League Spartan",sans-serif;letter-spacing:.12em;text-transform:uppercase;background:var(--ink);color:var(--bg);padding:7px 8px;transform:rotate(90deg) translateX(50%);transform-origin:right center}
+.shape{position:absolute;z-index:1;pointer-events:none;border:2px solid var(--ink);opacity:.9}.shape.circle{border-radius:50%}.shape.fill{background:var(--accent);border:0;mix-blend-mode:multiply}.shape.line{height:2px;border:0;background:var(--ink);transform-origin:left center}
+.layout-split .title{width:66%;align-self:flex-start}.layout-split .meta{grid-template-columns:1fr}.layout-split .date{position:absolute;right:7%;top:16%;font-size:clamp(3rem,5vw,5rem);writing-mode:vertical-rl}
+.layout-center .title{text-align:center;align-self:center}.layout-center .topline{border:0}.layout-center .meta{text-align:center;grid-template-columns:1fr}.layout-center .venue{max-width:100%}.layout-center .date{text-align:center}
+.layout-offset .title{margin-left:12%;width:90%}.layout-offset .topline{transform:rotate(-2deg)}
+.layout-grid .poster-inner{padding:5.8%}.layout-grid .title{border:2px solid currentColor;padding:4%;font-size:calc(var(--title-size)*.86)}.layout-grid .meta{border:0;background:var(--ink);color:var(--bg);padding:4%}
+.empty{grid-column:1/-1;padding:60px;border:1px solid var(--line);color:#999;text-align:center;line-height:1.6}
+.data-note{margin-top:24px;border-top:1px solid var(--line);padding-top:20px;color:#727272;font-size:.72rem;line-height:1.55;max-width:900px}
+@media(max-width:1100px){.wall{grid-template-columns:repeat(3,1fr)}.mast{grid-template-columns:1fr}.controls{justify-content:flex-start}}
+@media(max-width:760px){.wall{grid-template-columns:repeat(2,1fr)}h1{line-height:.82}}
+@media(max-width:470px){.wall{grid-template-columns:1fr}.poster{max-width:410px;margin:auto;width:100%}}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Bitcount:ELSH,slnt,wght@0..100,-8..0,100..900&family=Tilt+Prism:XROT,YROT@-45..45,-45..45&family=Tilt+Warp:XROT,YROT@-45..45,-45..45&display=swap" rel="stylesheet">
+<style>
+/* SPRINT A: Bitcount's ELSH morphs pixel elements with cursor X, slnt reacts to scroll,
+   and concert start times drive the poster headline weight: event timing becomes visible typography. */
+:root{--font-axis-shape:44.2;--font-axis-slant:-1;--font-axis-weight:553}
+h1{font-family:'Bitcount','League Spartan',sans-serif!important;font-size:57px;line-height:1.12;letter-spacing:-.02em;font-variation-settings:'ELSH' var(--font-axis-shape),'slnt' var(--font-axis-slant),'wght' var(--font-axis-weight);transition:font-variation-settings .1s ease-out;overflow-wrap:anywhere}
+/* Sprint A: poster typefaces are chosen per event. Their axes are set once per render,
+   based on the concert start hour / venue, while the main Bitcount header reacts to the cursor. */
+.poster .title{font-family:var(--title-font,'Bitcount'),sans-serif;letter-spacing:-.025em;transition:none}
+.poster.font-bitcount .title{font-variation-settings:'ELSH' var(--poster-shape,44.2),'slnt' var(--poster-slant,-1),'wght' var(--event-weight,553)}
+.poster.font-prism .title,.poster.font-warp .title{font-variation-settings:'XROT' var(--poster-xrot,0),'YROT' var(--poster-yrot,0);letter-spacing:-.045em}
+.poster.font-prism .title{line-height:.87}
+.poster.font-warp .title{line-height:.88}
+/* Skip layout and paint of offscreen poster tiles in compatible browsers. */
+.wall>.poster{content-visibility:auto;contain-intrinsic-size:auto 420px}
+.preview-art .poster{content-visibility:visible}
+
+.axis-lab{margin:15px 0 0;border:1px solid #393939;background:#111;padding:15px 18px;display:flex;align-items:center;gap:15px;flex-wrap:wrap}
+.axis-heading{font-size:.76rem;letter-spacing:.13em;font-weight:800}
+.axis-description{flex:1 1 300px;color:#aaa;font-size:.78rem;line-height:1.5}
+.axis-readouts{display:flex;gap:15px;flex-wrap:wrap;font-size:.75rem;font-variant-numeric:tabular-nums;color:#aaa}
+.axis-readouts b{color:#fff}
+.axis-reset{border:1px solid #777;background:#eee;color:#161616;padding:10px 12px;cursor:pointer;font-weight:bold;font-size:.72rem}
+.axis-note{font-size:.69rem;color:#888;flex-basis:100%}
+.axis-collapse{margin-left:auto;border:1px solid #555;background:#1c1c1c;color:#fff;width:36px;height:34px;display:grid;place-items:center;cursor:pointer;font-size:1.05rem;line-height:1;transition:background .15s}
+.axis-collapse:hover{background:#333}.axis-collapse:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.axis-content{display:contents}.axis-lab.is-collapsed .axis-content{display:none}
+.axis-lab.is-collapsed{padding-top:10px;padding-bottom:10px}
+.mast-toggle-bar{display:flex;justify-content:flex-end;margin-bottom:8px}
+.mast-toggle{border:1px solid #555;background:#1b1b1b;color:#eee;padding:8px 12px;cursor:pointer;font-size:.7rem;font-weight:800;letter-spacing:.08em;min-height:36px}
+.mast-toggle:hover{background:#333}.mast-toggle:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.mast.is-collapsed{display:none}
+@media(max-width:760px){h1{font-size:clamp(37px,7vw,57px)}}
+@media(prefers-reduced-motion:reduce){h1,.poster .title{transition:none}}
+
+/* Poster inspection: a full-size preview and a separate event-link rail. */
+.poster{width:100%;padding:0;text-align:left;cursor:zoom-in;font:inherit;appearance:none}
+.poster:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.poster-preview-overlay[hidden]{display:none!important}
+.poster-preview-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.88);display:grid;place-items:center;padding:clamp(12px,3vw,38px);overflow-y:auto}
+.poster-preview-dialog{position:relative;width:min(1040px,100%);max-height:calc(100dvh - 28px);display:grid;grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);gap:clamp(16px,3vw,36px);align-items:center;background:#111;border:1px solid #494949;padding:clamp(18px,3vw,35px);overflow-y:auto}
+.preview-art{display:flex;justify-content:center;align-items:center;min-width:0}
+.preview-art .poster{width:min(100%,420px);max-height:calc(100dvh - 115px);aspect-ratio:2/3;transform:none;pointer-events:none;cursor:default;flex-shrink:0}
+.preview-art .poster:hover{transform:none;filter:none}
+.preview-art .poster .topline{font-size:clamp(.55rem,1.1vw,.85rem)}
+.preview-art .poster .title{font-size:clamp(2.3rem,5vw,var(--title-size,4rem))}
+.preview-art .poster .date{font-size:clamp(2rem,4vw,3.2rem)}
+.preview-details{align-self:center;min-width:0}
+.preview-kicker{font-size:.7rem;letter-spacing:.2em;color:#aaa;margin-bottom:15px;text-transform:uppercase}
+.preview-name{font-family:'League Spartan',sans-serif;font-size:clamp(1.6rem,3vw,3rem);line-height:1;overflow-wrap:anywhere;margin-bottom:20px}
+.preview-info{display:grid;gap:13px;padding:19px 0;border-top:1px solid #444;border-bottom:1px solid #444}
+.preview-info div{display:grid;gap:4px}.preview-info dt{font-size:.64rem;letter-spacing:.15em;color:#888;text-transform:uppercase}.preview-info dd{font-size:.96rem;overflow-wrap:anywhere}
+.preview-link{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:24px;padding:15px 17px;color:#111;background:#f5f5f5;text-decoration:none;font-weight:800;text-transform:uppercase;font-size:.85rem}
+.preview-link:hover{background:#d5f55b}.preview-link[hidden]{display:none}
+.preview-no-link{color:#999;font-size:.8rem;margin-top:20px}
+.preview-close{position:absolute;top:10px;right:10px;z-index:10;border:1px solid #555;background:#222;color:#fff;cursor:pointer;width:38px;height:38px;font-size:1.3rem;display:grid;place-items:center}
+.preview-close:hover{background:#444}body.preview-open{overflow:hidden}
+@media(max-width:690px){.poster-preview-dialog{grid-template-columns:1fr;max-height:calc(100dvh - 24px);gap:20px}.preview-art .poster{width:min(70%,280px);max-height:none}.preview-details{padding-bottom:4px}.preview-name{font-size:1.7rem}.poster-preview-overlay{padding:12px}}
+@media(prefers-reduced-motion:reduce){.poster-preview-overlay{backdrop-filter:none}}
+</style>
+</head>
+<body>
+<main class="shell">
+  <div class="mast-toggle-bar"><button type="button" class="mast-toggle" id="mastToggle" aria-controls="mastHeader" aria-expanded="true" aria-label="Hide Live Event Poster Wall header">HIDE HEADER ▲</button></div>
+  <header class="mast" id="mastHeader">
+    <div>
+      <div class="eyebrow">ART 3041 · DATA-DRIVEN GENERATIVE WEBSITE</div>
+      <h1>LIVE EVENT<br>POSTER WALL</h1>
+      <p class="intro">Upcoming concerts become generative posters. Event data controls type scale, palette, rotation, shape density, and layout. Generate again to redesign the same live feed without changing the events.</p>
+    </div>
+    <div class="controls">
+      <button class="control primary" id="generateBtn">Generate New Wall</button>
+      <button class="control" id="shuffleBtn">Shuffle Events</button>
+      <button class="control" id="refreshBtn">Refresh Event Feed</button>
+      <select class="control" id="countSelect" aria-label="Number of posters">
+        <option value="8">8 posters</option>
+        <option value="12" selected>12 posters</option>
+        <option value="16">16 posters</option>
+        <option value="24">24 posters</option>
+      </select>
+    </div>
+  </header>
+
+  <section class="axis-lab" aria-label="Sprint A live variable font engine">
+    <strong class="axis-heading">SPRINT A / BITCOUNT</strong>
+    <button type="button" class="axis-collapse" id="axisCollapse" aria-label="Hide Bitcount controls" aria-expanded="true" aria-controls="axisContent" title="Hide Bitcount controls">&#9650;</button>
+    <div class="axis-content" id="axisContent">
+    <span class="axis-description">Move your cursor left/right to change <b>Element Shape</b>. Scroll the page to change <b>Slant</b>. Concert start times and venues control each poster’s font axes.</span>
+    <div class="axis-readouts"><span>SIZE <b>57</b></span><span>ELSH <b id="shapeValue">44.2</b></span><span>SLNT <b id="slantValue">-1.0</b></span><span>WGHT <b id="weightValue">553</b></span></div>
+    <button type="button" class="axis-reset" id="axisReset">RESET FONT</button>
+    <small class="axis-note">LIVE INPUTS: cursor X → ELSH · scroll % → slnt · event time → poster wght. Initial settings: 57 / -1 / 553 / 44.2.</small>
+    </div>
+  </section>
+  <section class="statusbar">
+    <div id="feedStatus">Loading event feed…</div>
+    <div class="legend">
+      <span><b>DATE</b> → palette</span><span><b>TIME</b> → angle</span><span><b>TITLE LENGTH</b> → scale</span><span><b>VENUE</b> → shapes + font axes</span>
+    </div>
+  </section>
+
+  <section class="wall" id="wall" aria-live="polite"></section>
+  <p class="data-note">The built-in October–December 2026 concert list is a <b>Ticketmaster-sourced snapshot</b>, not a real-time feed. GitHub Pages can load newer <b>events.json</b> when it is published. Past shows are hidden automatically. <b>Generate New Wall</b> changes the artwork; <b>Refresh Live Data</b> checks for a newer published JSON file. Automatic updates require configuring the included GitHub Action with a Ticketmaster API key. Poster links open Ticketmaster event pages or search results.</p>
+</main>
+
+<div class="poster-preview-overlay" id="posterPreview" hidden>
+  <section class="poster-preview-dialog" role="dialog" aria-modal="true" aria-labelledby="previewName" aria-label="Event poster preview">
+    <button class="preview-close" id="previewClose" type="button" aria-label="Close poster preview">×</button>
+    <div class="preview-art" id="previewArt" aria-hidden="true"></div>
+    <aside class="preview-details">
+      <div class="preview-kicker">EVENT / POSTER PREVIEW</div>
+      <h2 class="preview-name" id="previewName"></h2>
+      <dl class="preview-info">
+        <div><dt>Date</dt><dd id="previewDate"></dd></div>
+        <div><dt>Time</dt><dd id="previewTime"></dd></div>
+        <div><dt>Venue</dt><dd id="previewVenue"></dd></div>
+        <div><dt>Location</dt><dd id="previewLocation"></dd></div>
+        <div><dt>Genre</dt><dd id="previewGenre"></dd></div>
+      </dl>
+      <a class="preview-link" id="previewLink" href="#" target="_blank" rel="noopener noreferrer">Open ticket / event link <span aria-hidden="true">↗</span></a>
+      <p class="preview-no-link" id="previewNoLink" hidden>No event link available for this listing.</p>
+    </aside>
+  </section>
+</div>
+<script>
+const wall=document.getElementById('wall');
+const feedStatus=document.getElementById('feedStatus');
+const countSelect=document.getElementById('countSelect');
+let feed=[];let wallSeed=Math.floor(Math.random()*1e9);let shuffled=[];
+
+
+// Built-in fallback feed.
+// This lets the poster wall work even when the HTML is opened by itself,
+// from ChatGPT preview, or from a local file where fetch('events.json') is blocked.
+const FALLBACK_EVENT_FEED={"updated_at":"2026-10-17T18:00:00Z","source":"Ticketmaster public listings (curated snapshot, not automatically live)","source_url":"https://www.ticketmaster.com/discover/new-york-city?categoryId=KZFzniwnSyZfZ7v7nJ","events":[{"name":"JPEGMAFIA (16 and Over)","date":"2026-10-17","time":"20:00","venue":"Terminal 5","city":"New York","state":"NY","genre":"Hip-Hop / Rap","url":"https://www.ticketmaster.com/search?q=JPEGMAFIA%20%2816%20and%20Over%29%20Terminal%205","image":""},{"name":"Bethel Music 2026 Tour","date":"2026-10-17","time":"18:00","venue":"Irving Plaza","city":"New York","state":"NY","genre":"Religious","url":"https://www.ticketmaster.com/search?q=Bethel%20Music%202026%20Tour%20Irving%20Plaza","image":""},{"name":"After","date":"2026-10-21","time":"19:00","venue":"Bowery Ballroom","city":"New York","state":"NY","genre":"Concert","url":"https://www.ticketmaster.com/search?q=After%20Bowery%20Ballroom","image":""},{"name":"Arcángel - La 8va Maravilla World Tour","date":"2026-10-23","time":"20:00","venue":"Barclays Center","city":"Brooklyn","state":"NY","genre":"Latin","url":"https://www.ticketmaster.com/search?q=Arc%C3%A1ngel%20-%20La%208va%20Maravilla%20World%20Tour%20Barclays%20Center","image":""},{"name":"KATSEYE: THE WILDWORLD TOUR","date":"2026-10-24","time":"20:00","venue":"UBS Arena","city":"Elmont","state":"NY","genre":"Pop","url":"https://www.ticketmaster.com/search?q=KATSEYE%3A%20THE%20WILDWORLD%20TOUR%20UBS%20Arena","image":""},{"name":"Candlebox","date":"2026-10-26","time":"19:00","venue":"Bowery Ballroom","city":"New York","state":"NY","genre":"Rock","url":"https://www.ticketmaster.com/search?q=Candlebox%20Bowery%20Ballroom","image":""},{"name":"Rod Wave: Don't Look Down Tour","date":"2026-10-27","time":"20:00","venue":"Barclays Center","city":"Brooklyn","state":"NY","genre":"Hip-Hop / Rap","url":"https://www.ticketmaster.com/search?q=Rod%20Wave%3A%20Don%27t%20Look%20Down%20Tour%20Barclays%20Center","image":""},{"name":"Rod Wave: Don't Look Down Tour","date":"2026-10-28","time":"20:00","venue":"Barclays Center","city":"Brooklyn","state":"NY","genre":"Hip-Hop / Rap","url":"https://www.ticketmaster.com/search?q=Rod%20Wave%3A%20Don%27t%20Look%20Down%20Tour%20Barclays%20Center","image":""},{"name":"RAWAYANA - ¿Dónde es el after? World Tour","date":"2026-10-31","time":"20:00","venue":"Barclays Center","city":"Brooklyn","state":"NY","genre":"Latin","url":"https://www.ticketmaster.com/search?q=RAWAYANA%20-%20%C2%BFD%C3%B3nde%20es%20el%20after%3F%20World%20Tour%20Barclays%20Center","image":""},{"name":"Boney James Live","date":"2026-11-01","time":"20:00","venue":"Sony Hall","city":"New York","state":"NY","genre":"Jazz","url":"https://www.ticketmaster.com/search?q=Boney%20James%20Live%20Sony%20Hall","image":""},{"name":"LETDOWN. - The Happy Tour","date":"2026-11-01","time":"20:00","venue":"Mercury Lounge","city":"New York","state":"NY","genre":"Rock","url":"https://www.ticketmaster.com/search?q=LETDOWN.%20-%20The%20Happy%20Tour%20Mercury%20Lounge","image":""},{"name":"ROA: USA Tour","date":"2026-11-01","time":"20:00","venue":"Palladium Times Square","city":"New York","state":"NY","genre":"Latin","url":"https://www.ticketmaster.com/search?q=ROA%3A%20USA%20Tour%20Palladium%20Times%20Square","image":""},{"name":"Omer Adam","date":"2026-11-01","time":"20:30","venue":"Barclays Center","city":"Brooklyn","state":"NY","genre":"World","url":"https://www.ticketmaster.com/search?q=Omer%20Adam%20Barclays%20Center","image":""},{"name":"Coyle Girelli","date":"2026-11-02","time":"21:00","venue":"Mercury Lounge","city":"New York","state":"NY","genre":"Concert","url":"https://www.ticketmaster.com/search?q=Coyle%20Girelli%20Mercury%20Lounge","image":""},{"name":"Keenan TreVon","date":"2026-11-04","time":"21:00","venue":"Mercury Lounge","city":"New York","state":"NY","genre":"Concert","url":"https://www.ticketmaster.com/search?q=Keenan%20TreVon%20Mercury%20Lounge","image":""},{"name":"Yazmin Lacey","date":"2026-11-09","time":"20:00","venue":"Blue Note Jazz Club","city":"New York","state":"NY","genre":"Jazz","url":"https://www.ticketmaster.com/search?q=Yazmin%20Lacey%20Blue%20Note%20Jazz%20Club","image":""},{"name":"Dave Matthews Band","date":"2026-11-12","time":"19:30","venue":"Madison Square Garden","city":"New York","state":"NY","genre":"Rock","url":"https://www.ticketmaster.com/search?q=Dave%20Matthews%20Band%20Madison%20Square%20Garden","image":""},{"name":"Catch Your Breath - Not Broken Enough Tour","date":"2026-11-13","time":"18:00","venue":"Irving Plaza","city":"New York","state":"NY","genre":"Rock","url":"https://www.ticketmaster.com/search?q=Catch%20Your%20Breath%20-%20Not%20Broken%20Enough%20Tour%20Irving%20Plaza","image":""},{"name":"Eggy: The Final Tour (of 2026)","date":"2026-11-14","time":"20:00","venue":"Bowery Ballroom","city":"New York","state":"NY","genre":"Rock","url":"https://www.ticketmaster.com/search?q=Eggy%3A%20The%20Final%20Tour%20%28of%202026%29%20Bowery%20Ballroom","image":""},{"name":"Mountain Grass Unit","date":"2026-11-14","time":"20:00","venue":"Brooklyn Bowl","city":"Brooklyn","state":"NY","genre":"Bluegrass","url":"https://www.ticketmaster.com/search?q=Mountain%20Grass%20Unit%20Brooklyn%20Bowl","image":""},{"name":"SOMBR - You Are The Reason Tour","date":"2026-11-23","time":"19:00","venue":"Madison Square Garden","city":"New York","state":"NY","genre":"Pop","url":"https://www.ticketmaster.com/search?q=SOMBR%20-%20You%20Are%20The%20Reason%20Tour%20Madison%20Square%20Garden","image":""},{"name":"JOHN SUMMIT - CTRL ESCAPE ARENA TOUR","date":"2026-11-28","time":"19:00","venue":"Barclays Center","city":"Brooklyn","state":"NY","genre":"Dance / Electronic","url":"https://www.ticketmaster.com/search?q=JOHN%20SUMMIT%20-%20CTRL%20ESCAPE%20ARENA%20TOUR%20Barclays%20Center","image":""},{"name":"Doja Cat - Tour Ma Vie World Tour","date":"2026-12-01","time":"19:30","venue":"Madison Square Garden","city":"New York","state":"NY","genre":"Pop","url":"https://www.ticketmaster.com/search?q=Doja%20Cat%20-%20Tour%20Ma%20Vie%20World%20Tour%20Madison%20Square%20Garden","image":""},{"name":"Jonas Brothers: The Burning Up Tour All Over Again","date":"2026-12-19","time":"19:30","venue":"UBS Arena","city":"Elmont","state":"NY","genre":"Pop","url":"https://www.ticketmaster.com/search?q=Jonas%20Brothers%3A%20The%20Burning%20Up%20Tour%20All%20Over%20Again%20UBS%20Arena","image":""},{"name":"Phish","date":"2026-12-30","time":"19:30","venue":"Madison Square Garden","city":"New York","state":"NY","genre":"Rock","url":"https://www.ticketmaster.com/phish-new-york-new-york-12-30-2026/event/3B00653D12D41F7C","image":""},{"name":"Phish","date":"2026-12-31","time":"19:30","venue":"Madison Square Garden","city":"New York","state":"NY","genre":"Rock","url":"https://www.ticketmaster.com/event/3B00653D12DC1F89","image":""}]};
+
+// Only show shows that have not started, in New York time. The upper limit is Dec 31, 2026.
+function nyNow(){
+ const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
+ const a=Object.fromEntries(parts.map(p=>[p.type,p.value]));
+ return {day:`${a.year}-${a.month}-${a.day}`,clock:`${a.hour}:${a.minute}`};
+}
+function upcoming(events){
+ const now=nyNow();const used=new Set();
+ return events.filter(e=>{
+  if(!e?.name||!/^\d{4}-\d{2}-\d{2}$/.test(e.date)||e.date>'2026-12-31')return false;
+  if(e.date<now.day||(e.date===now.day&&e.time&&e.time<now.clock))return false;
+  const k=[e.name,e.date,e.time,e.venue].join('|').toLowerCase();
+  if(used.has(k))return false;used.add(k);return true;
+ }).sort((a,b)=>(a.date+' '+(a.time||'00:00')).localeCompare(b.date+' '+(b.time||'00:00')));
+}
+
+function useFallbackFeed(message='BUILT-IN EVENT FEED'){
+  feed=upcoming(FALLBACK_EVENT_FEED.events||[]);
+  shuffled=[...feed];
+  const stamp=FALLBACK_EVENT_FEED.updated_at
+    ? new Date(FALLBACK_EVENT_FEED.updated_at).toLocaleString()
+    : 'embedded';
+  feedStatus.textContent=`${feed.length} UPCOMING EVENTS · ${message} · UPDATED ${stamp}`.toUpperCase();
+  render();
+}
+
+
+const palettes=[
+ ['#f2c5d4','#151111','#ff3f74'],['#f3e55b','#111','#ff4c35'],['#a9d7ff','#0b1636','#ff4c8b'],['#ff795f','#17100f','#ffe64b'],
+ ['#d4f551','#111','#ff43b7'],['#111827','#f8d568','#ff5f87'],['#ead9ff','#26133d','#fa5e51'],['#f0e7d4','#d51f3f','#111'],
+ ['#b7e2d0','#101b17','#ff663b'],['#202020','#efb4ce','#f2dd59'],['#d7b78a','#18120b','#cf2749'],['#e2f0ff','#35224c','#f55b4a']
+];
+const fonts=['Bitcount','Tilt Prism','Tilt Warp'];
+const layouts=['stack','split','center','offset','grid'];
+
+function hash(str){let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function rng(seed){let x=seed>>>0;return()=>{x+=0x6D2B79F5;let t=x;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
+function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function fmtDate(date){const d=new Date(date+'T12:00:00');return{mon:d.toLocaleDateString('en-US',{month:'short'}).toUpperCase(),day:String(d.getDate()).padStart(2,'0'),dow:d.toLocaleDateString('en-US',{weekday:'short'}).toUpperCase()}}
+function fmtTime(t){if(!t)return'TBA';const [h,m]=t.split(':').map(Number);const d=new Date(2000,0,1,h,m);return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}
+function shuffle(a,random=Math.random){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+function pick(arr,r){return arr[Math.floor(r()*arr.length)]}
+
+function shapeHTML(r,event){
+ const n=2+(hash(event.venue||event.name)%2);let out='';
+ for(let i=0;i<n;i++){
+   const kind=pick(['circle','fill','line'],r),size=18+Math.floor(r()*120),x=Math.floor(r()*90),y=Math.floor(r()*84),rot=Math.floor(r()*170)-85;
+   const style=kind==='line'?`left:${x}%;top:${y}%;width:${size}px;transform:rotate(${rot}deg)`:`left:${x}%;top:${y}%;width:${size}px;height:${size}px;transform:rotate(${rot}deg)`;
+   out+=`<i class="shape ${kind}" style="${style}"></i>`;
+ }
+ return out;
+}
+
+function posterHTML(event,index){
+ const date=fmtDate(event.date);const base=hash(event.name+event.date+wallSeed+index);const r=rng(base);
+ const palette=palettes[(Number(date.day)+Math.floor(r()*palettes.length))%palettes.length];
+ const hour=Number((event.time||'18:00').split(':')[0]||18);const eventWeight=Math.round(100+Math.min(23,Math.max(0,hour))/23*800);const tilt=((hour%6)-2.5)*.34;
+ const layout=pick(layouts,r);
+ // Cycle all three typefaces across the visible wall; Generate New Wall changes their positions.
+ const font=fonts[(index+(wallSeed%3))%fonts.length];const len=event.name.length;
+ const fontClass=font==='Bitcount'?'font-bitcount':font==='Tilt Prism'?'font-prism':'font-warp';
+ const xrot=Math.round(Math.max(-30,Math.min(30,(hour-12)*2.7)));
+ const yrot=Math.round((hash(event.venue||event.name)%51)-25);
+ const posterShape=Math.round((hash(event.genre||event.name)%75)+12);
+ const posterSlant=-Math.min(8,hour%9);
+ const size=Math.max(1.9,Math.min(5.25,5.25-len*.046+r()*.5));
+ const rot=(r()*8-4).toFixed(2),tx=(r()*16-8).toFixed(1)+'px',ty=(r()*20-10).toFixed(1)+'px';
+ const genre=(event.genre||'LIVE').toUpperCase();const city=[event.city,event.state].filter(Boolean).join(', ');
+ const img=event.image?`<img class="poster-image" src="${esc(event.image)}" alt="" loading="lazy">`:'';
+ return `<button type="button" class="poster layout-${layout} ${fontClass}" data-poster-index="${index}" aria-label="Enlarge poster for ${esc(event.name)}" style="--bg:${palette[0]};--ink:${palette[1]};--accent:${palette[2]};--tilt:${tilt}deg;--title-font:'${font}';--title-size:${size}rem;--event-weight:${eventWeight};--poster-xrot:${xrot};--poster-yrot:${yrot};--poster-shape:${posterShape};--poster-slant:${posterSlant};--rot:${rot}deg;--tx:${tx};--ty:${ty}">
+ ${img}${shapeHTML(r,event)}<span class="tickets">Tickets ↗</span><div class="poster-inner">
+ <div class="topline"><span>${esc(genre)}</span><span>${esc(fmtTime(event.time))}</span></div>
+ <div class="title">${esc(event.name)}</div>
+ <div class="meta"><div><div class="venue">${esc(event.venue||'VENUE TBA')}</div><div class="city">${esc(city||'LOCATION TBA')}</div></div><div class="date"><span>${date.mon}</span><br>${date.day}</div></div>
+ </div></button>`;
+}
+
+let displayedEvents=[];
+function render(){
+ const n=Number(countSelect.value);const list=upcoming(shuffled.length?shuffled:feed).slice(0,n);
+ displayedEvents=list;
+ if(!list.length){wall.innerHTML='<div class="empty">No events are currently available. The page will keep the last successful feed if a live refresh fails.</div>';return}
+ wall.innerHTML=list.map(posterHTML).join('');
+}
+
+
+async function loadFeed(force=false){
+  // Always start with the embedded feed so the page is never empty.
+  if(!feed.length) useFallbackFeed('BUILT-IN FALLBACK');
+
+  feedStatus.textContent=force
+    ? 'CHECKING FOR UPDATED EVENTS.JSON…'
+    : 'LOADING EVENT FEED…';
+
+  // Local file previews usually cannot fetch sibling JSON because of browser security.
+  if(location.protocol==='file:'){
+    useFallbackFeed('LOCAL / BUILT-IN FEED');
+    return;
+  }
+
+  try{
+    const res=await fetch('events.json'+(force?'?t='+Date.now():''),
+      {cache:force?'no-store':'default'});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+
+    const data=await res.json();
+    const liveEvents=upcoming(data.events||[]);
+    if(!liveEvents.length) throw new Error('No upcoming concerts in events.json');
+
+    feed=liveEvents;
+    shuffled=[...feed];
+
+    const stamp=data.updated_at
+      ? new Date(data.updated_at).toLocaleString()
+      : 'unknown time';
+
+    feedStatus.textContent=
+      `${feed.length} UPCOMING EVENTS · EVENTS.JSON SNAPSHOT · UPDATED ${stamp}`.toUpperCase();
+
+    render();
+  }catch(err){
+    console.warn('Live events.json unavailable. Using embedded fallback feed.',err);
+    useFallbackFeed(force
+      ? 'NO UPDATED FEED · USING BUILT-IN SNAPSHOT'
+      : 'BUILT-IN FALLBACK FEED');
+  }
+}
+
+document.getElementById('generateBtn').addEventListener('click',()=>{wallSeed=Math.floor(Math.random()*1e9);render()});
+document.getElementById('shuffleBtn').addEventListener('click',()=>{const r=rng(Date.now());shuffled=shuffle(feed,r);wallSeed=Math.floor(Math.random()*1e9);render()});
+document.getElementById('refreshBtn').addEventListener('click',()=>loadFeed(true));countSelect.addEventListener('change',render);
+// Sprint A: keep user's initial Bitcount settings until the relevant live input changes.
+const fontRoot=document.documentElement;
+const shapeValue=document.getElementById('shapeValue');
+const slantValue=document.getElementById('slantValue');
+function setFontAxis(property,value,display){
+  fontRoot.style.setProperty(property,value);
+  if(property==='--font-axis-shape')shapeValue.textContent=display;
+  if(property==='--font-axis-slant')slantValue.textContent=display;
+}
+let pointerFrame=0;
+window.addEventListener('pointermove',event=>{
+  if(document.hidden||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  if(pointerFrame)return;
+  const x=event.clientX;
+  pointerFrame=requestAnimationFrame(()=>{
+    const value=Math.round(Math.max(0,Math.min(100,x/window.innerWidth*100))/3)*3;
+    if(Math.abs(value-Number(shapeValue.textContent))>=3)setFontAxis('--font-axis-shape',value.toFixed(1),value.toFixed(1));
+    pointerFrame=0;
+  });
+},{passive:true});
+let scrollFrame=0;
+window.addEventListener('scroll',()=>{
+  if(scrollFrame)return;
+  scrollFrame=requestAnimationFrame(()=>{
+    const maxScroll=Math.max(1,document.documentElement.scrollHeight-window.innerHeight);
+    const progress=Math.max(0,Math.min(1,window.scrollY/maxScroll));
+    const value=Math.round((-1-progress*7)*2)/2;
+    if(value!==Number(slantValue.textContent))setFontAxis('--font-axis-slant',value.toFixed(2),value.toFixed(2));
+    scrollFrame=0;
+  });
+},{passive:true});
+document.getElementById('axisReset').addEventListener('click',()=>{
+  setFontAxis('--font-axis-shape','44.2','44.2');
+  setFontAxis('--font-axis-slant','-1','-1.0');
+  fontRoot.style.setProperty('--font-axis-weight',553);
+});
+// Independently collapse the entire header (title, description and generator buttons).
+// The compact toggle remains accessible so visitors can reopen everything.
+const mastToggle=document.getElementById('mastToggle');
+const mastHeader=document.getElementById('mastHeader');
+mastToggle.addEventListener('click',()=>{
+  const collapsed=mastHeader.classList.toggle('is-collapsed');
+  mastToggle.textContent=collapsed?'SHOW HEADER ▼':'HIDE HEADER ▲';
+  mastToggle.setAttribute('aria-expanded',String(!collapsed));
+  mastToggle.setAttribute('aria-label',collapsed?'Show Live Event Poster Wall header':'Hide Live Event Poster Wall header');
+});
+// Collapse only the Bitcount control panel; live variable-font behavior stays active.
+const axisCollapse=document.getElementById('axisCollapse');
+const axisLab=document.querySelector('.axis-lab');
+axisCollapse.addEventListener('click',()=>{
+  const collapsed=axisLab.classList.toggle('is-collapsed');
+  axisCollapse.textContent=collapsed?'▼':'▲';
+  axisCollapse.setAttribute('aria-expanded',String(!collapsed));
+  axisCollapse.setAttribute('aria-label',collapsed?'Show Bitcount controls':'Hide Bitcount controls');
+  axisCollapse.title=collapsed?'Show Bitcount controls':'Hide Bitcount controls';
+});
+
+// Open an enlarged copy of the poster instead of immediately leaving the page.
+// A dedicated action on the right opens the event URL in a separate tab.
+const preview=document.getElementById('posterPreview');
+const previewClose=document.getElementById('previewClose');
+const previewLink=document.getElementById('previewLink');
+let priorFocus=null;
+function validEventUrl(raw){
+  try{const u=new URL(raw,location.href);return (u.protocol==='https:'||u.protocol==='http:')?u.href:null}
+  catch{return null}
+}
+function openPoster(index,clicked){
+ const event=displayedEvents[index];
+ if(!event||!clicked)return;
+ priorFocus=document.activeElement;
+ const clone=clicked.cloneNode(true);
+ clone.removeAttribute('data-poster-index');clone.removeAttribute('aria-label');
+ clone.setAttribute('tabindex','-1');
+ document.getElementById('previewArt').replaceChildren(clone);
+ document.getElementById('previewName').textContent=event.name||'Untitled event';
+ const parsed=new Date(event.date+'T12:00:00');
+ document.getElementById('previewDate').textContent=Number.isNaN(parsed.getTime())?event.date:parsed.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+ document.getElementById('previewTime').textContent=fmtTime(event.time);
+ document.getElementById('previewVenue').textContent=event.venue||'Venue TBA';
+ document.getElementById('previewLocation').textContent=[event.city,event.state].filter(Boolean).join(', ')||'Location TBA';
+ document.getElementById('previewGenre').textContent=event.genre||'Live event';
+ const url=validEventUrl(event.url);
+ previewLink.hidden=!url;
+ document.getElementById('previewNoLink').hidden=!!url;
+ if(url)previewLink.href=url;else previewLink.removeAttribute('href');
+ preview.hidden=false;document.body.classList.add('preview-open');previewClose.focus();
+}
+function closePoster(){
+ preview.hidden=true;document.body.classList.remove('preview-open');
+ document.getElementById('previewArt').replaceChildren();
+ if(priorFocus?.isConnected)priorFocus.focus();
+}
+wall.addEventListener('click',e=>{
+ const poster=e.target.closest('[data-poster-index]');
+ if(poster&&wall.contains(poster))openPoster(Number(poster.dataset.posterIndex),poster);
+});
+previewClose.addEventListener('click',closePoster);
+preview.addEventListener('click',e=>{if(e.target===preview)closePoster()});
+document.addEventListener('keydown',e=>{
+ if(preview.hidden)return;
+ if(e.key==='Escape'){e.preventDefault();closePoster()}
+ if(e.key==='Tab'){
+   const focusables=[previewClose,...(!previewLink.hidden?[previewLink]:[])];
+   const i=focusables.indexOf(document.activeElement);
+   if(e.shiftKey&&i<=0){e.preventDefault();focusables.at(-1).focus()}
+   else if(!e.shiftKey&&i===focusables.length-1){e.preventDefault();focusables[0].focus()}
+ }
+});
+
+loadFeed();
+</script>
+</body>
+</html>
